@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* 以降、アプリのテーブル定義 */
+enum Gender {
+  オス
+  メス
+  不明
+}
+
+enum ApplicationStatus {
+  募集中
+  審査中
+  決定
+}
+
+enum PublicStatus {
+  下書き
+  公開
+  非公開
+}
+
+enum MessageCategory {
+  問合せ
+  回答
+}
+
+model Animal {
+  id  Int @id @default(autoincrement())
+  animalTypeId Int
+  name String
+  gender Gender?
+  age Int?
+  description String?
+  applicationStatus ApplicationStatus
+  publicStatus PublicStatus
+
+  animalType  AnimalType  @relation(fields: [animalTypeId], references: [id])
+
+  inquiryMeta InquiryMeta[]
+  IndividualAnimal IndividualAnimal[]
+  OrganizationAnimal OrganizationAnimal[]
+  Image Image[]
+
+  AdoptionApplication AdoptionApplication[]
+}
+
+model AnimalType {
+  id  Int @id @default(autoincrement()) 
+  type String @unique 
+  animal Animal[]
+}
+
+model Individual {
+  id  Int @id @default(autoincrement()) 
+  individualId String @unique 
+
+  InquiryMeta InquiryMeta[]
+  IndividualAnimal IndividualAnimal[]
+  applicant AdoptionApplication[] @relation("Applicant")
+  creator AdoptionApplication[] @relation("Creator")
+}
+
+model Organization {
+  id  Int @id @default(autoincrement()) 
+  organizationId String @unique 
+
+  InquiryMeta InquiryMeta[]
+  OrganizationAnimal OrganizationAnimal[]
+}
+
+
+model InquiryMeta {
+  id  Int @id @default(autoincrement()) 
+  animalId Int
+  individualId String
+  organizationId String
+
+  animal  Animal  @relation(fields: [animalId], references: [id])
+  individual  Individual  @relation(fields: [individualId], references: [individualId])
+  organization  Organization  @relation(fields: [organizationId], references: [organizationId])
+
+  InquiryContent InquiryContent[]
+}
+
+model InquiryContent {
+  id  Int @id @default(autoincrement()) 
+  metaId Int
+  messageCategory MessageCategory
+  message String 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inquiryMeta  InquiryMeta  @relation(fields: [metaId], references: [id])
+}
+
+model IndividualAnimal {
+  id  Int @id @default(autoincrement()) 
+  individualId String
+  animalId Int
+
+  individual  Individual  @relation(fields: [individualId], references: [individualId]) 
+  animal  Animal  @relation(fields: [animalId], references: [id])
+}
+
+model OrganizationAnimal {
+  id  Int @id @default(autoincrement()) 
+  organizationId String
+  animalId Int
+
+  organization  Organization  @relation(fields: [organizationId], references: [organizationId])
+  animal  Animal  @relation(fields: [animalId], references: [id])
+}
+
+model Image {
+  id  Int @id @default(autoincrement()) 
+  animalId Int 
+  imageUrl String
+  
+  animal  Animal  @relation(fields: [animalId], references: [id])
+}
+
+model AdoptionApplication {
+  id  Int @id @default(autoincrement()) 
+  animalId Int 
+  individualId String
+  applicationDate DateTime @default(now())
+  notes String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String
+
+  animal  Animal  @relation(fields: [animalId], references: [id])
+
+  individual      Individual @relation("Applicant", fields: [individualId], references: [individualId])
+  creator         Individual @relation("Creator", fields: [createdBy], references: [individualId])
+}
