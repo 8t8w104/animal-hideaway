@@ -1,5 +1,3 @@
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
 
 import { PrismaClient } from '@prisma/client'
 
