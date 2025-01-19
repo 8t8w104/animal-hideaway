@@ -3,13 +3,13 @@ import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
 import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 
-// import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
-// const prisma = new PrismaClient()
+const prisma = new PrismaClient()
 
 export default async function Home() {
-  // const animals = await prisma.animal.findMany({})
-  // console.log(animals);
+  const animals = await prisma.animal.count()
+  console.log(animals);
 
   return (
     <>
