@@ -1,8 +1,5 @@
 import { resetPasswordAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
-import { SubmitButton } from "@/components/submit-button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default async function ResetPassword(props: {
   searchParams: Promise<Message>;
@@ -14,23 +11,23 @@ export default async function ResetPassword(props: {
       <p className="text-sm text-foreground/60">
         Please enter your new password below.
       </p>
-      <Label htmlFor="password">New password</Label>
-      <Input
+      <label htmlFor="password">New password</label>
+      <input
         type="password"
         name="password"
         placeholder="New password"
         required
       />
-      <Label htmlFor="confirmPassword">Confirm password</Label>
-      <Input
+      <label htmlFor="confirmPassword">Confirm password</label>
+      <input
         type="password"
         name="confirmPassword"
         placeholder="Confirm password"
         required
       />
-      <SubmitButton formAction={resetPasswordAction}>
+      <div>
         Reset password
-      </SubmitButton>
+      </div>
       <FormMessage message={searchParams} />
     </form>
   );
