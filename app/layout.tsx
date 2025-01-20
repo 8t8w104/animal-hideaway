@@ -1,7 +1,9 @@
 import { Header } from "@/components/Header";
 import { Geist } from "next/font/google";
 import { Footer } from "@/components/Footer";
+import '@mantine/core/styles.css';
 import "./globals.css";
+import { MantineProvider } from "@mantine/core";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,13 +28,15 @@ export default function RootLayout({
   return (
     <html lang="ja" className={geistSans.className}>
       <body>
-        <Header />
-        <main>
-          <div>
-            {children}
-          </div>
-        </main>
-        <Footer />
+        <MantineProvider>
+          <Header />
+          <main>
+            <div>
+              {children}
+            </div>
+          </main>
+          <Footer />
+        </MantineProvider>
       </body>
     </html >
   );
