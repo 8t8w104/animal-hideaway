@@ -1,6 +1,6 @@
-import { Header } from "@/components/Header";
+import { Header } from "@/app/components/Header";
 import { Geist } from "next/font/google";
-import { Footer } from "@/components/Footer";
+import { Footer } from "@/app/components/Footer";
 import '@mantine/core/styles.css';
 import "./globals.css";
 import { MantineProvider } from "@mantine/core";

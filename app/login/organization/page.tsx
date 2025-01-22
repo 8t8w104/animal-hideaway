@@ -1,7 +1,7 @@
 'use client'
 
-import { GoogleButton } from '@/components/GoogleButton';
-import { TwitterButton } from '@/components/TwitterButton';
+import { GoogleButton } from '@/app/components/GoogleButton';
+import { TwitterButton } from '@/app/components/TwitterButton';
 import {
   Anchor,
   Button,
