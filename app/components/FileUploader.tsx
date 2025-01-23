@@ -1,13 +1,17 @@
 'use client'
+import { SignedUrlType } from "@/utils/constants";
 import { useState } from "react";
 
 export const FileUploader: React.FC<FileProps> = ({ filePath }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>("");
+  const [objectURL, setObjectURL] = useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const fileObject = e.target.files[0];
+      setFile(fileObject);
+      setObjectURL(window.URL.createObjectURL(fileObject));
     }
   };
 
@@ -23,7 +27,7 @@ export const FileUploader: React.FC<FileProps> = ({ filePath }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ filePath }),
+      body: JSON.stringify({ filePath, action: SignedUrlType.Upload }),
     });
     console.log(`res=${res}`);
     if (!res.ok) {
@@ -51,6 +55,7 @@ export const FileUploader: React.FC<FileProps> = ({ filePath }) => {
     <div>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleUpload}>Upload</button>
+      <img src={objectURL || undefined} alt="test" style={{ width: "200px", height: "200px" }} />
       <p>{uploadStatus}</p>
     </div>
   );
