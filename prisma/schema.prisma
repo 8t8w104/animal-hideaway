@@ -126,10 +126,19 @@ model OrganizationAnimal {
 
 model Image {
   id  Int @id @default(autoincrement()) 
-  animalId Int 
+  parentId Int 
   imageUrl String
+  fileName String
+  path String
+  contentType String
+  publicFlag	Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String
   
-  animal  Animal  @relation(fields: [animalId], references: [id])
+  animal  Animal  @relation(fields: [parentId], references: [id])
 }
 
 model AdoptionApplication {

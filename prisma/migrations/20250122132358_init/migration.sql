@@ -91,8 +91,16 @@ CREATE TABLE "OrganizationAnimal" (
 -- CreateTable
 CREATE TABLE "Image" (
     "id" SERIAL NOT NULL,
-    "animalId" INTEGER NOT NULL,
+    "parentId" INTEGER NOT NULL,
     "imageUrl" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "contentType" TEXT NOT NULL,
+    "publicFlag" BOOLEAN NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "updatedBy" TEXT NOT NULL,
 
     CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
 );
@@ -149,7 +157,7 @@ ALTER TABLE "OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_organization
 ALTER TABLE "OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Image" ADD CONSTRAINT "Image_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Image" ADD CONSTRAINT "Image_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
