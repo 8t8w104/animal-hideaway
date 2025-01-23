@@ -1,4 +1,5 @@
 'use client'
+import { SignedUrlType } from "@/utils/constants";
 import { useState } from "react";
 
 
@@ -16,7 +17,7 @@ export const FileDownloader: React.FC<FileProps> = ({ filePath }) => {
     const res = await fetch("/api/signed-url", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filePath, action: "download" }),
+      body: JSON.stringify({ filePath, action: SignedUrlType.Download }),
     });
 
     if (!res.ok) {
@@ -25,6 +26,9 @@ export const FileDownloader: React.FC<FileProps> = ({ filePath }) => {
     }
 
     const { signedUrl } = await res.json();
+
+    console.log(signedUrl);
+    console.log("↑signedUrl");
 
     // 2. 署名付きURLからファイルをダウンロード
     const downloadRes = await fetch(signedUrl);
