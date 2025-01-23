@@ -1,4 +1,5 @@
 'use client'
+import { FileDownloader } from "@/app/components/FileDownloader";
 import { FileUploader } from "@/app/components/FileUploader";
 import { generateFilePath } from "@/utils/path-utils";
 import { SetStateAction, useState } from "react";
@@ -8,9 +9,15 @@ export const Regist = () => {
   const filePath = generateFilePath("userId1", 1, "fileName1");
   console.log(`filePath=${filePath}`);
   return (
-    <div>
-      <h1>画像アップロード</h1>
-      <FileUploader filePath={filePath} />
-    </div>
+    <>
+      <div>
+        <h1>画像アップロード</h1>
+        <FileUploader filePath={filePath} />
+      </div>
+      <div>
+        <h1>画像ダウンロード</h1>
+        <FileDownloader filePath={filePath} />
+      </div>
+    </>
   );
 }
