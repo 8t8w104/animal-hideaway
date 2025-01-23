@@ -3,13 +3,12 @@ import { SignedUrlType } from "@/utils/constants";
 import { useState } from "react";
 
 
-export const FileDownloader: React.FC<FileProps> = ({ filePath }) => {
-  // const [filePath, setFilePath] = useState<string>("");
+export const FileDownloader: React.FC<FileProps> = ({ filePath, downloadFileName }) => {
   const [downloadStatus, setDownloadStatus] = useState<string>("");
 
   const handleDownload = async () => {
     if (!filePath) {
-      alert("Please enter a file path!");
+      alert("ファイルが選択されていません");
       return;
     }
 
@@ -21,14 +20,11 @@ export const FileDownloader: React.FC<FileProps> = ({ filePath }) => {
     });
 
     if (!res.ok) {
-      setDownloadStatus("Failed to generate signed URL");
+      setDownloadStatus("署名付きURL取得に失敗しました。");
       return;
     }
 
     const { signedUrl } = await res.json();
-
-    console.log(signedUrl);
-    console.log("↑signedUrl");
 
     // 2. 署名付きURLからファイルをダウンロード
     const downloadRes = await fetch(signedUrl);
@@ -42,12 +38,12 @@ export const FileDownloader: React.FC<FileProps> = ({ filePath }) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = filePath.split("/").pop()!;
+    a.download = downloadFileName || 'defaultFileName'; // ダウンロード時ファイル名
     document.body.appendChild(a);
     a.click();
     a.remove();
 
-    setDownloadStatus("File downloaded successfully!");
+    setDownloadStatus("ファイルダウンロードに成功しました。");
   };
 
   return (
