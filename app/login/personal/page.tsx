@@ -1,5 +1,6 @@
 'use client'
 
+import { Auth } from '@/app/components/Auth';
 import { GoogleButton } from '@/app/components/GoogleButton';
 import { TwitterButton } from '@/app/components/TwitterButton';
 import {
@@ -42,7 +43,8 @@ export default function Page() {
       </Text>
 
       <Group grow mb="md" mt="md">
-        <GoogleButton radius="xl">Google</GoogleButton>
+        <Auth />
+        <GoogleButton radius="xl" >Google</GoogleButton>
         <TwitterButton radius="xl">Twitter</TwitterButton>
       </Group>
 
