@@ -8,10 +8,6 @@ export const Header = async () => {
   console.log(user)
   console.log("↑supabaseServer.auth.getUser()")
 
-  const supabaseClient = await createSupabaseClient();
-  const session = await supabaseClient.auth.getSession()
-  console.log(session);
-  console.log("↑supabaseClient.auth.getSession()");
 
   return (
     <header>
