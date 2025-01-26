@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { signOutAction } from "../actions";
 import { User } from "@supabase/supabase-js";
+import { Auth } from "./Auth";
 
 const navItems = [
   { href: "/login/organization", label: "団体のログイン画面" },
@@ -38,6 +39,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
               </li>
             }
           </ol>
+          <Auth />
         </nav>
       </header>
     </>
