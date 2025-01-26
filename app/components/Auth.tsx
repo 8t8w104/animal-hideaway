@@ -9,10 +9,12 @@ export const Auth = () => {
 
   const handleLogin = async (provider: 'google' | 'github') => {
     const supabase = await createSupabaseClient();
+    const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_GITHUB_REDIRECT_URL!
+    console.log(`redirectTo=${redirectTo}`);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `http://localhost:3000/`,
+        redirectTo
       },
     })
     if (error) console.error('Error logging in:', error.message);
