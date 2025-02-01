@@ -11,7 +11,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   console.log(`animals/[id]=${id}`)
 
   // 動物を取得
-  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals/${params.id}`, {
+  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" }
   });
