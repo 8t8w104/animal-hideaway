@@ -4,6 +4,12 @@
 // import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
 
+export default async function Page() {
+  return (
+    <div>test</div>
+  )
+}
+
 // export default async function Page({ params }: { params: { id: string } }) {
 //   const { id } = params;
 //   console.log(`animals/[id]=${id}`)
