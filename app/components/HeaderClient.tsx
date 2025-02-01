@@ -15,8 +15,6 @@ const navItems = [
 ];
 
 export const HeaderClient = ({ user }: { user: User | null }) => {
-  console.log(user);
-  console.log("HeaderClient user");
 
   useEffect(() => {
     const getSession = async () => {
