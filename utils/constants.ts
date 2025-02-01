@@ -6,3 +6,6 @@ export enum SignedUrlType {
   Upload = "Upload",
   Download = "Download"
 }
+
+// ベースURL
+export const NEXT_PUBLIC_API_BASE_URL: string = process.env.NEXT_PUBLIC_API_BASE_URL!;
