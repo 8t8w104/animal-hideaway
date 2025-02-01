@@ -4,8 +4,9 @@
 // import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
+
+  const { id } = await params;
   console.log(`animals/[id]=${id}`)
   return (
     <div>test</div>
