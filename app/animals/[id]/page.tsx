@@ -6,7 +6,7 @@ import { ApplicationStatus, Gender, PublicStatus } from '@prisma/client';
 import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { id: number } }) {
   console.log(`animals/[id]=${params.id}`)
 
   // 動物を取得
