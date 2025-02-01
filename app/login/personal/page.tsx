@@ -42,7 +42,7 @@ export default function Page() {
       </Text>
 
       <Group grow mb="md" mt="md">
-        <GoogleButton radius="xl">Google</GoogleButton>
+        <GoogleButton radius="xl" >Google</GoogleButton>
         <TwitterButton radius="xl">Twitter</TwitterButton>
       </Group>
 
