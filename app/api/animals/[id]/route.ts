@@ -36,5 +36,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "動物が見つかりません。" }, { status: 404 });
   }
 
+  console.log(animal)
+  console.log("↑動物を取得しました")
+
   return NextResponse.json(animal);
 }

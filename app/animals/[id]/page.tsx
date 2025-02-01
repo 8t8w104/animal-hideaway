@@ -12,6 +12,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   });
 
   if (!res.ok) {
+    console.log(res.status)
+    console.log("↑res.status")
+    console.log(res.text)
+    console.log("↑res.text")
     console.log("データ取得に失敗しました。")
     return;
   }
