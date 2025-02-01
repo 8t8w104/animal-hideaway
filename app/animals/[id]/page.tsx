@@ -7,7 +7,7 @@ import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = await params;
+  const { id } = params;
   console.log(`animals/[id]=${id}`)
 
   // 動物を取得
