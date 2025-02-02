@@ -110,6 +110,7 @@ model IndividualAnimal {
   id  Int @id @default(autoincrement()) 
   individualId String
   animalId Int
+  userId String
 
   individual  Individual  @relation(fields: [individualId], references: [individualId]) 
   animal  Animal  @relation(fields: [animalId], references: [id])
@@ -119,6 +120,7 @@ model OrganizationAnimal {
   id  Int @id @default(autoincrement()) 
   organizationId String
   animalId Int
+  userId String
 
   organization  Organization  @relation(fields: [organizationId], references: [organizationId])
   animal  Animal  @relation(fields: [animalId], references: [id])
@@ -127,16 +129,14 @@ model OrganizationAnimal {
 model Image {
   id  Int @id @default(autoincrement()) 
   parentId Int 
-  imageUrl String
+  imageUrl String?
   fileName String
   path String
-  contentType String
-  publicFlag	Boolean
+  contentType String?
+  publicFlag	Boolean?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String
-  updatedBy String
   
   animal  Animal  @relation(fields: [parentId], references: [id])
 }
