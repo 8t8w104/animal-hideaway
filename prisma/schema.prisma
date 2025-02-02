@@ -6,11 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
+   previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+    schemas  = ["auth", "public"]
 }
 
 /* 以降、アプリのテーブル定義 */
@@ -18,23 +20,31 @@ enum Gender {
   オス
   メス
   不明
+
+  @@schema("public")
 }
 
 enum ApplicationStatus {
   募集中
   審査中
   決定
+
+  @@schema("public")
 }
 
 enum PublicStatus {
   下書き
   公開
   非公開
+
+  @@schema("public")
 }
 
 enum MessageCategory {
   問合せ
   回答
+
+  @@schema("public")
 }
 
 model Animal {
@@ -55,12 +65,16 @@ model Animal {
   Image Image[]
 
   AdoptionApplication AdoptionApplication[]
+
+  @@schema("public")
 }
 
 model AnimalType {
   id  Int @id @default(autoincrement()) 
   type String @unique 
   animal Animal[]
+
+  @@schema("public")
 }
 
 model Individual {
@@ -71,6 +85,8 @@ model Individual {
   IndividualAnimal IndividualAnimal[]
   applicant AdoptionApplication[] @relation("Applicant")
   creator AdoptionApplication[] @relation("Creator")
+
+  @@schema("public")
 }
 
 model Organization {
@@ -79,6 +95,8 @@ model Organization {
 
   InquiryMeta InquiryMeta[]
   OrganizationAnimal OrganizationAnimal[]
+
+  @@schema("public")
 }
 
 
@@ -93,6 +111,8 @@ model InquiryMeta {
   organization  Organization  @relation(fields: [organizationId], references: [organizationId])
 
   InquiryContent InquiryContent[]
+
+  @@schema("public")
 }
 
 model InquiryContent {
@@ -104,6 +124,8 @@ model InquiryContent {
   updatedAt DateTime @updatedAt
 
   inquiryMeta  InquiryMeta  @relation(fields: [metaId], references: [id])
+
+  @@schema("public")
 }
 
 model IndividualAnimal {
@@ -114,6 +136,8 @@ model IndividualAnimal {
 
   individual  Individual  @relation(fields: [individualId], references: [individualId]) 
   animal  Animal  @relation(fields: [animalId], references: [id])
+
+  @@schema("public")
 }
 
 model OrganizationAnimal {
@@ -124,6 +148,8 @@ model OrganizationAnimal {
 
   organization  Organization  @relation(fields: [organizationId], references: [organizationId])
   animal  Animal  @relation(fields: [animalId], references: [id])
+
+  @@schema("public")
 }
 
 model Image {
@@ -139,6 +165,8 @@ model Image {
   updatedAt DateTime @updatedAt
   
   animal  Animal  @relation(fields: [parentId], references: [id])
+
+  @@schema("public")
 }
 
 model AdoptionApplication {
@@ -156,4 +184,6 @@ model AdoptionApplication {
 
   individual      Individual @relation("Applicant", fields: [individualId], references: [individualId])
   creator         Individual @relation("Creator", fields: [createdBy], references: [individualId])
+
+  @@schema("public")
 }
