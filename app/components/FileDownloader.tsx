@@ -3,7 +3,7 @@ import { SignedUrlType } from "@/utils/constants";
 import { useState } from "react";
 
 
-export const FileDownloader: React.FC<FileProps> = ({ filePath, downloadFileName }) => {
+export const FileDownloader: React.FC<DownloadFileProps> = ({ filePath, downloadFileName }) => {
   const [downloadStatus, setDownloadStatus] = useState<string>("");
 
   const handleDownload = async () => {
