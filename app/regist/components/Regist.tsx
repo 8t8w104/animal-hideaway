@@ -12,8 +12,8 @@ import { Animal, ApplicationStatus, Gender, PublicStatus } from "@prisma/client"
 export const Regist = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [filePath, setFilePath] = useState<string>();
-  const [fileName, setFileName] = useState<string>();
+  const [filePath, setFilePath] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
 
   const form = useForm({
     initialValues: {
