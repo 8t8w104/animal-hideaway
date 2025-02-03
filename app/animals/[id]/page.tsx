@@ -1,8 +1,8 @@
 import { AnimalDetail } from './components/AnimalDetail';
 import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   try {
     const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`, {
