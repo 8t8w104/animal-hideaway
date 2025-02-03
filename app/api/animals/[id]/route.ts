@@ -4,40 +4,78 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  // ルートパラメータの`id`を取得
-  const pathname = req.nextUrl.pathname;
-  const id = pathname.split('/').pop();
+  const id = req.nextUrl.pathname.split('/').pop();
 
   if (!id) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
   }
 
-  // Prismaで検索
-  const animal = await prisma.animal.findUnique({
-    where: { id: Number(id) },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      gender: true,
-      applicationStatus: true,
-      publicStatus: true,
-      animalType: {
-        select: {
-          id: true,
-          type: true
-        }
-      }
-    },
-  });
+  try {
+    const animal = await prisma.animal.findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        name: true,
+        gender: true,
+        description: true,
+        applicationStatus: true,
+        publicStatus: true,
+        animalType: {
+          select: {
+            id: true,
+            type: true,
+          },
+        },
+      },
+    });
 
-  // 結果を返却
-  if (!animal) {
-    return NextResponse.json({ error: "動物が見つかりません。" }, { status: 404 });
+    if (!animal) {
+      return NextResponse.json({ error: "動物が見つかりません。" }, { status: 404 });
+    }
+
+    return NextResponse.json(animal);
+  } catch (error) {
+    return NextResponse.json({ error: "データ取得に失敗しました。" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const id = req.nextUrl.pathname.split('/').pop();
+  const body = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
   }
 
-  console.log(animal)
-  console.log("↑動物を取得しました")
+  try {
+    const updatedAnimal = await prisma.animal.update({
+      where: { id: Number(id) },
+      data: {
+        name: body.name,
+        gender: body.gender,
+        description: body.description,
+        applicationStatus: body.applicationStatus,
+        publicStatus: body.publicStatus,
+      },
+    });
 
-  return NextResponse.json(animal);
+    return NextResponse.json(updatedAnimal);
+  } catch (error) {
+    return NextResponse.json({ error: "更新に失敗しました。" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const id = req.nextUrl.pathname.split('/').pop();
+
+  if (!id) {
+    return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
+  }
+
+  try {
+    await prisma.animal.delete({ where: { id: Number(id) } });
+    return NextResponse.json({ message: "動物が削除されました。" });
+  } catch (error) {
+    return NextResponse.json({ error: "削除に失敗しました。" }, { status: 500 });
+  }
 }

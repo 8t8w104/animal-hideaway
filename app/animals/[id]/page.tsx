@@ -1,30 +1,24 @@
-import { AnimalsDetail } from './components/AnimalsDetail';
+import { AnimalDetail } from './components/AnimalDetail';
 import { NEXT_PUBLIC_API_BASE_URL } from '@/utils/constants';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  console.log(`animals/[id]=${id}`)
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
 
-  // 動物を取得
-  const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" }
-  });
+  try {
+    const res = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  if (!res.ok) {
-    console.log(res.status)
-    console.log("↑res.status")
-    console.log(res.text)
-    console.log("↑res.text")
-    console.log("データ取得に失敗しました。")
-    return;
+    if (!res.ok) {
+      console.error(`データ取得に失敗しました。ステータス: ${res.status}`);
+      return <p>データの取得に失敗しました。</p>;
+    }
+
+    const animal = await res.json();
+    return <AnimalDetail animal={animal} />;
+  } catch (error) {
+    console.error("エラーが発生しました:", error);
+    return <p>データの取得に失敗しました。</p>;
   }
-
-  const animals = await res.json();
-  console.log(animals)
-  console.log("↑detail/page.tsx animals")
-
-  return (
-    <AnimalsDetail animal={animals} />
-  );
 }
