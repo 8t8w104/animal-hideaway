@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Gender, PrismaClient } from "@prisma/client";
+import { getSupabaseSignedUrl } from "../signed-url/route";
 
 const prisma = new PrismaClient();
 
@@ -29,9 +30,6 @@ export async function GET(req: NextRequest) {
     where.name = { contains: name, mode: 'insensitive' };
   }
 
-  console.log(where)
-  console.log("↑where")
-
   const animals = await prisma.animal.findMany({
     select: {
       id: true,
@@ -45,6 +43,16 @@ export async function GET(req: NextRequest) {
           id: true,
           type: true
         }
+      },
+      Image: {
+        select: {
+          parentId: true,
+          imageUrl: true,
+          fileName: true,
+          path: true,
+          contentType: true,
+          publicFlag: true,
+        }
       }
     },
     // where: {
@@ -56,6 +64,26 @@ export async function GET(req: NextRequest) {
 
   console.log(animals);
   console.log(`↑api/animals/api 検索結果`);
+
+  // 取得結果1件以上の場合
+  if (animals.length) {
+    await Promise.all(
+      animals.map(async (animal) => {
+        // 画像が存在する場合
+        if (animal.Image.length) {
+          animal.Image = await Promise.all(
+            animal.Image.map(async (image) => {
+              return {
+                ...image,
+                // オブジェクトキーより署名付きURLを取得する
+                imageUrl: await getSupabaseSignedUrl(image.path),
+              }
+            })
+          );
+        }
+      })
+    );
+  }
 
   return NextResponse.json(animals || []);
 }

@@ -35,7 +35,7 @@ export const Animals = () => {
           {formattedAnimal.name}
         </Text>
         <AspectRatio ratio={1920 / 1080} >
-          <Image className={classes["image-wrapper"]} src={formattedAnimal.description || "/assets/noImage.jpg"} alt="Default image" width={400} height={300} />
+          <Image className={classes["image-wrapper"]} src={formattedAnimal.Image[0]?.imageUrl || "/assets/noImage.jpg"} alt="Default image" width={400} height={300} />
         </AspectRatio>
         <Text c="dimmed" size="xs" tt="uppercase" fw={700} mt="md">
           {formattedAnimal.animalTypeName}
