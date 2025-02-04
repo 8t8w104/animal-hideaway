@@ -34,15 +34,17 @@ export async function PUT(req: NextRequest) {
   console.log("inserted organizationAnimal")
 
   // 画像（image）
-  const image = await prisma.image.create({
-    data: {
-      parentId: animal.id,
-      path: body.filePath || "",
-      fileName: body.fileName || "",
-    },
-  })
-  console.log(image)
-  console.log("inserted image")
+  if (body.filePath) {
+    const image = await prisma.image.create({
+      data: {
+        parentId: animal.id,
+        path: body.filePath || "",
+        fileName: body.fileName || "",
+      },
+    })
+    console.log(image)
+    console.log("inserted image")
+  }
 
   return NextResponse.json(animal);
 }
