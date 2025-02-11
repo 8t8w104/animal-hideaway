@@ -7,8 +7,7 @@ import { createSupabaseClient } from "@/utils/supabase/client";
 import { useEffect } from "react";
 
 const navItems = [
-  { href: "/login/organization", label: "団体のログイン画面" },
-  { href: "/login/personal", label: "個人のログイン画面" },
+  { href: "/login", label: "ログインする" },
   { href: "/regist", label: "動物を登録する" },
   { href: "/animals", label: "動物を検索する" },
   { href: "/contact", label: "運営に問い合わせる" },
@@ -53,7 +52,6 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
               </li>
             }
           </ol>
-          <Auth />
         </nav>
       </header>
     </>

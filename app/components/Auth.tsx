@@ -11,13 +11,38 @@ export const Auth = () => {
     const supabase = await createSupabaseClient();
     const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_GITHUB_REDIRECT_URL!
     console.log(`redirectTo=${redirectTo}`);
+    const role = "general"
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo
+        redirectTo: `${redirectTo}?role=${role}`
       },
     })
     if (error) console.error('Error logging in:', error.message);
+
+    console.log("Auth 1")
+
+    // // ログイン完了後、セッションが確立されるのを待つ
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession();
+    // console.log("Auth 2")
+    // if (!session) {
+    //   console.error("Session is not available after login.");
+    //   return;
+    // }
+    // console.log("Auth 3")
+    // // ユーザーの role を更新
+    // const { error: updateError } = await supabase.auth.updateUser({
+    //   data: { role: '職員' },
+    // });
+    // console.log("Auth 4")
+    // if (updateError) {
+    //   console.error('Error updating user role:', updateError.message);
+    // } else {
+    //   console.log('User role updated successfully.');
+    // }
+    // console.log("Auth 5")
   };
 
   const handleLogout = async () => {
