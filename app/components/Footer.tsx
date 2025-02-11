@@ -1,6 +1,6 @@
 'use client'
 import { Box, Text, useMantineTheme, Group, ActionIcon, Center } from '@mantine/core';
-import { IconBrandInstagram, IconBrandX } from '@tabler/icons-react'
+import { IconBrandInstagram, IconBrandX } from '@tabler/icons-react';
 
 export const Footer = () => {
   const theme = useMantineTheme();
@@ -10,12 +10,13 @@ export const Footer = () => {
   return (
     <Box
       style={{
-        backgroundColor: theme.colors.gray[0], // ヘッダーと同じ背景色
+        backgroundColor: theme.colors.gray[0],
         padding: theme.spacing.md,
+        width: '100%',
       }}
     >
       <Center>
-        <Group gap="xl"> {/* 中央揃え */}
+        <Group gap="xl">
           <Text style={{ color: "dimmed" }} size="sm">
             &copy; {currentYear} Animal Matching. All rights reserved.
           </Text>
@@ -27,7 +28,6 @@ export const Footer = () => {
               <IconBrandInstagram size={18} />
             </ActionIcon>
           </Group>
-
         </Group>
       </Center>
     </Box>
