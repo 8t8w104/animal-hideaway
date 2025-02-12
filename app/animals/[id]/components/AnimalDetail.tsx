@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, Image, Text, Container, Stack, Title, Paper, Button, TextInput, Textarea, Grid, Select } from '@mantine/core';
+import Image from 'next/image';
+import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Textarea, Grid, Select } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -45,7 +46,18 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       <Card shadow="sm" padding="lg" radius="md" withBorder>
         <Grid>
           <Grid.Col span={12}>
-            <Image src={"/assets/noImage.jpg"} height={300} alt={animal.name} radius="md" />
+            <div style={{ position: "relative", width: "100%", maxWidth: "500px", height: "auto" }}>
+              <Image
+                src={animal.Image[0]?.imageUrl || "/assets/noImage.jpg"}
+                alt={animal.name || "Default image"}
+                layout="responsive"
+                width={500}
+                height={300}
+                objectFit="cover"
+                priority
+              />
+            </div>
+
           </Grid.Col>
           <Grid.Col span={12}>
             <Stack mt="md">
