@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getSupabaseSignedUrl } from "@/utils/supabase";
+
 
 const prisma = new PrismaClient();
 
@@ -23,15 +25,42 @@ export async function GET(req: NextRequest) {
         animalType: {
           select: {
             id: true,
-            type: true,
-          },
+            type: true
+          }
         },
+        Image: {
+          select: {
+            parentId: true,
+            imageUrl: true,
+            fileName: true,
+            path: true,
+            contentType: true,
+            publicFlag: true,
+          }
+        }
       },
     });
 
     if (!animal) {
       return NextResponse.json({ error: "動物が見つかりません。" }, { status: 404 });
     }
+
+    // 画像が存在する場合
+    if (animal.Image.length) {
+      animal.Image = await Promise.all(
+        animal.Image.map(async (image) => {
+          return {
+            ...image,
+            // オブジェクトキーより署名付きURLを取得する
+            imageUrl: await getSupabaseSignedUrl(image.path),
+          }
+        })
+      );
+    }
+
+
+    console.log(animal)
+    console.log("↑api/animals/[id] 検索結果")
 
     return NextResponse.json(animal);
   } catch (error) {
