@@ -39,7 +39,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const handleDelete = async () => {
     const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
     if (res.ok) {
-      router.push('/animals');
+      router.push('/');
     }
   };
 
