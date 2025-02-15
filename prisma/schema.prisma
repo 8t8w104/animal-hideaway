@@ -12,7 +12,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-    schemas  = ["auth", "public"]
+  schemas  = ["public"]
 }
 
 /* 以降、アプリのテーブル定義 */
@@ -135,7 +135,7 @@ model IndividualAnimal {
   userId String
 
   individual  Individual  @relation(fields: [individualId], references: [individualId]) 
-  animal  Animal  @relation(fields: [animalId], references: [id])
+  animal  Animal  @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -146,7 +146,7 @@ model OrganizationAnimal {
   animalId Int
   userId String
 
-  organization  Organization  @relation(fields: [organizationId], references: [organizationId])
+  organization  Organization  @relation(fields: [organizationId], references: [organizationId], onDelete: Cascade)
   animal  Animal  @relation(fields: [animalId], references: [id])
 
   @@schema("public")
@@ -164,7 +164,7 @@ model Image {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  animal  Animal  @relation(fields: [parentId], references: [id])
+  animal  Animal  @relation(fields: [parentId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -180,7 +180,7 @@ model AdoptionApplication {
   createdBy String
   updatedBy String
 
-  animal  Animal  @relation(fields: [animalId], references: [id])
+  animal  Animal  @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
   individual      Individual @relation("Applicant", fields: [individualId], references: [individualId])
   creator         Individual @relation("Creator", fields: [createdBy], references: [individualId])
