@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApplicationStatus, Gender, PrismaClient, PublicStatus } from "@prisma/client";
-import { SUPABASE_BUCKETS } from "@/app/constants/env";
-import { SIGNED_URL_EXPIRATION, SignedUrlType } from "@/utils/constants";
-import { createClient } from "@/utils/supabase/server";
+import { getSupabaseSignedUrl } from "@/utils/supabase";
 
 const prisma = new PrismaClient();
 
@@ -73,24 +71,4 @@ export async function GET(req: NextRequest) {
     console.log(JSON.stringify(error))
     return NextResponse.json({ error: "取得に失敗しました。" }, { status: 500 });
   }
-}
-
-/**
- * filePathから署名付きURLを取得
- * @param filePath 画像のパス
- * @returns 署名付きURL (取得できなかった場合は `null`)
- */
-async function getSupabaseSignedUrl(filePath: string): Promise<string | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.storage
-    .from(SUPABASE_BUCKETS)
-    .createSignedUrl(filePath, SIGNED_URL_EXPIRATION);
-
-  if (error) {
-    console.error("Failed to get signed URL:", error.message);
-    return null;
-  }
-
-  return data.signedUrl;
 }
