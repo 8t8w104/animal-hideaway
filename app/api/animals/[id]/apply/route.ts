@@ -44,8 +44,7 @@ export async function POST(req: NextRequest) {
     console.log("before adoptionApplication.create")
     const date = new Date()
 
-    let adoptionApplication: Prisma.AdoptionApplicationCreateInput
-    adoptionApplication = {
+    const adoptionApplication = {
       animal: { connect: { id: Number(id) } },
       individual: { connect: { individualId: body.userId } },
       applicationDate: date,
@@ -54,14 +53,14 @@ export async function POST(req: NextRequest) {
       updatedAt: date,
       createdBy: body.userId,
       updatedBy: body.userId
-    };
+    }
 
 
-    const newApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
+    // const newApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
 
 
-    console.log(`body.userId=${body.userId}`)
-    console.log(`date=${date}`)
+    // console.log(`body.userId=${body.userId}`)
+    // console.log(`date=${date}`)
     // const adoptionApplication = await prisma.adoptionApplication.create({
     //   data: {
     //     animalId: Number(id),
@@ -79,7 +78,8 @@ export async function POST(req: NextRequest) {
     // console.log(newApplication)
     console.log("after adoptionApplication.create")
 
-    return NextResponse.json(newApplication);
+    // return NextResponse.json(newApplication);
+    return NextResponse.json([]);
   } catch (error) {
     console.log("↓error")
     // console.log(error)
