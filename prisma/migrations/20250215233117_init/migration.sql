@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "auth";
-
 -- CreateEnum
 CREATE TYPE "public"."Gender" AS ENUM ('オス', 'メス', '不明');
 
@@ -151,19 +148,19 @@ ALTER TABLE "public"."InquiryContent" ADD CONSTRAINT "InquiryContent_metaId_fkey
 ALTER TABLE "public"."IndividualAnimal" ADD CONSTRAINT "IndividualAnimal_individualId_fkey" FOREIGN KEY ("individualId") REFERENCES "public"."Individual"("individualId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."IndividualAnimal" ADD CONSTRAINT "IndividualAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."IndividualAnimal" ADD CONSTRAINT "IndividualAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("organizationId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("organizationId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Image" ADD CONSTRAINT "Image_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "public"."Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Image" ADD CONSTRAINT "Image_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_individualId_fkey" FOREIGN KEY ("individualId") REFERENCES "public"."Individual"("individualId") ON DELETE RESTRICT ON UPDATE CASCADE;
