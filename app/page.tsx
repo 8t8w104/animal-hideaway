@@ -1,13 +1,20 @@
-
-// import { PrismaClient } from '@prisma/client'
-
-// const prisma = new PrismaClient()
+import { NEXT_PUBLIC_API_BASE_URL } from "@/utils/constants";
+import { Animals } from "./animals/components/Animals";
 
 export default async function Home() {
-  // const animals = await prisma.animal.count()
-  // console.log(animals);
+
+  const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const animals = await response.json();
 
   return (
-    <div>Home</div>
+    <>
+      <Animals initAnimals={animals} />
+    </>
   );
 }

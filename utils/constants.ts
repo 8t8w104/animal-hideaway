@@ -9,3 +9,9 @@ export enum SignedUrlType {
 
 // ベースURL
 export const NEXT_PUBLIC_API_BASE_URL: string = process.env.NEXT_PUBLIC_API_BASE_URL!;
+
+// ロール
+export enum Role {
+  General = "general",
+  Staff = "staff"
+}

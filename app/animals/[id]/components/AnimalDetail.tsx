@@ -1,10 +1,12 @@
 'use client';
 
-import { Card, Image, Text, Container, Stack, Title, Paper, Button, TextInput, Textarea, Grid, Select } from '@mantine/core';
+import { Card, Image, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUserStore } from "@/store/useUserStore";
+import { Role } from '@/utils/constants';
 
 export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const router = useRouter();
@@ -16,6 +18,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     publicStatus: animal.publicStatus || '',
   });
   const [isEditing, setIsEditing] = useState(false);
+  const { role, userId } = useUserStore()
 
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -39,6 +42,18 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       router.push('/animals');
     }
   };
+
+  const handleApply = async () => {
+    const res = await fetch(`/api/animals/${animal.id}/apply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    });
+    if (res.ok) {
+      router.refresh();
+      setIsEditing(false);
+    }
+  }
 
   return (
     <Container size="sm" py="xl">
@@ -99,13 +114,27 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                   <Text>性別: {animal.gender || '未設定'}</Text>
                   <Text>応募ステータス: {animal.applicationStatus || '未設定'}</Text>
                   <Text>公開ステータス: {animal.publicStatus || '未設定'}</Text>
-                  <Button onClick={() => setIsEditing(true)} color="blue">編集</Button>
-                  <Button onClick={handleDelete} color="red">削除</Button>
+                  {role === Role.Staff && (
+                    <>
+                      <Button onClick={() => setIsEditing(true)} color="blue">編集</Button>
+                      <Button onClick={handleDelete} color="red">削除</Button>
+                    </>
+                  )}
                 </>
               )}
             </Stack>
           </Grid.Col>
         </Grid>
+
+        {/* 応募するボタン */}
+        {role === Role.General &&
+          <Center>
+            <Group style={{ marginTop: '20px' }}>
+              <Button color="green" size="lg" onClick={handleApply}>応募する</Button>
+            </Group>
+          </Center>
+        }
+
       </Card>
     </Container>
   );
