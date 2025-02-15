@@ -7,27 +7,30 @@ import {
   Button,
   Avatar,
   Text,
-  useMantineTheme,
-  Container,
-  Center,
   Box,
+  Burger,
+  Drawer,
+  Stack
 } from '@mantine/core';
 import { useUserStore } from "@/store/useUserStore";
 import { useEffect } from "react";
 import { IconPaw } from "@tabler/icons-react";
+import { Role } from "@/utils/constants";
+import { useDisclosure } from "@mantine/hooks";
+import { useRouter } from "next/navigation";
 
 const navItems = [
-  // { href: "/animals", label: "動物を検索する" },
-  { href: "/regist", label: "動物を登録する" },
-  // { href: "/contact", label: "運営に問い合わせる" },
+  { href: "/", label: "動物を検索する" },
+  { href: "/regist", label: "動物を登録する", roles: [Role.Staff] },
 ];
 
 export const HeaderClient = ({ user }: { user: User | null }) => {
-  const theme = useMantineTheme();
   const { setUserId, setRole } = useUserStore();
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const role = user?.user_metadata?.role;
+  const userId = user?.id;
 
-  const role = user?.user_metadata?.role
-  const userId = user?.id
+  const router = useRouter()
   useEffect(() => {
     if (role) {
       setRole(role);
@@ -37,16 +40,17 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
     }
   }, [role, setRole, userId, setUserId]);
 
-
   const handleSignOutClick = () => {
-    signOutAction()
+    signOutAction();
+    close();
   };
+
   return (
     <Box
       style={{
-        backgroundColor: theme.colors.gray[0],
+        backgroundColor: '#f8f9fa',
         height: 60,
-        padding: theme.spacing.md,
+        padding: 16,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -55,43 +59,71 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
       <Link href="/" passHref legacyBehavior>
         <Text
           component="a"
-          style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center' }} // アイコンとテキストを横並びにする
+          style={{ fontWeight: 700, display: 'flex', alignItems: 'center' }}
           size="lg"
         >
-          <IconPaw size={20} style={{ marginRight: 8 }} /> {/* アイコンを追加 */}
+          <IconPaw size={20} style={{ marginRight: 8 }} />
           Animal Matching
         </Text>
       </Link>
-      <Group gap="xl" align="center">
-        <nav>
-          <Group gap="sm">
-            {navItems.map((item, index) => (
+
+      <Burger opened={opened} onClick={toggle} hiddenFrom="sm" />
+      <Drawer opened={opened} onClose={close} title="メニュー" size="xs" padding="md" position="right">
+        <Stack>
+          {navItems.map((item, index) => (
+            (!item.roles || item.roles.includes(role)) && (
               <Link key={index} href={item.href} passHref legacyBehavior>
-                <Text component="a" color="blue" size="sm" style={{ weight: "500", textDecoration: 'none' }}>
+                <Text
+                  component="a"
+                  size="md"
+                  c="blue"
+                  onClick={close}
+                >
                   {item.label}
                 </Text>
               </Link>
-            ))}
-          </Group>
-        </nav>
-        {user ? (
-          <Center>
-            <Group gap="sm">
-              <Avatar src={user?.user_metadata?.avatar_url} radius="xl" />
-              <Text style={{ weight: "500" }} >{user.email}</Text>
-              <Button onClick={handleSignOutClick} color="red">
-                Sign out
+            )
+          ))}
+          {user ? (
+            <>
+              <Group>
+                <Avatar src={user?.user_metadata?.avatar_url} radius="xl" />
+                <Text>{user.email}</Text>
+              </Group>
+              <Button onClick={handleSignOutClick} color="red" fullWidth>
+                サインアウト
               </Button>
-            </Group>
-          </Center>
+            </>
+          ) : (
+            <Button onClick={() => {
+              close()
+              router.push("/login")
+
+            }}>ログイン / 新規登録</Button>
+          )}
+        </Stack>
+      </Drawer>
+
+      <Group gap="md" align="center" visibleFrom="sm">
+        {navItems.map((item, index) => (
+          (!item.roles || item.roles.includes(role)) && (
+            <Link key={index} href={item.href} passHref legacyBehavior>
+              <Text component="a" c="blue" size="sm">
+                {item.label}
+              </Text>
+            </Link>
+          )
+        ))}
+        {user ? (
+          <Button onClick={handleSignOutClick} color="red">
+            サインアウト
+          </Button>
         ) : (
-          <Center>
-            <Group>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <Button>Login / Sign Up</Button>
-              </Link>
-            </Group>
-          </Center>
+          <Link href="/login">
+            <Button onClick={close}>
+              ログイン / 新規登録
+            </Button>
+          </Link>
         )}
       </Group>
     </Box>

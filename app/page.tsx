@@ -1,5 +1,6 @@
 import { NEXT_PUBLIC_API_BASE_URL } from "@/utils/constants";
 import { Animals } from "./animals/components/Animals";
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
 
@@ -9,6 +10,9 @@ export default async function Home() {
       'Content-Type': 'application/json',
     },
   });
+  if (!response.ok) {
+    redirect(`/error?message=${response.status}:${response.statusText}`);
+  }
 
   const animals = await response.json();
 

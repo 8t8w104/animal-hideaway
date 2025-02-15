@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Accordion, AspectRatio, Button, Card, Container, Flex, Grid, Image, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { ApplicationStatus, Gender, PublicStatus } from '@prisma/client';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/useUserStore';
 
 export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] }) => {
@@ -21,7 +21,10 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
     event.preventDefault();
     const queryParams = new URLSearchParams(Object.entries(formData).filter(([_, v]) => v));
     const response = await fetch(`/api/animals?${queryParams}`);
-    if (response.ok) setAnimals(await response.json());
+    if (!response.ok) {
+      redirect(`/error?message=${response.status}:${response.statusText}`);
+    }
+    setAnimals(await response.json());
   };
 
   const genderOptions = useMemo(() => [
