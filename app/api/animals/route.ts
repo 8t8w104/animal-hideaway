@@ -7,8 +7,7 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const params = Object.fromEntries(searchParams.entries());
-  const { name, gender, applicationStatus, publicStatus } = params;
-
+  const { name, gender, applicationStatus, publicStatus, animalType } = params;
   try {
     const animals = await prisma.animal.findMany({
       select: {
@@ -40,6 +39,7 @@ export async function GET(req: NextRequest) {
         gender: gender as Gender,
         applicationStatus: applicationStatus as ApplicationStatus,
         publicStatus: publicStatus as PublicStatus,
+        animalTypeId: animalType ? Number(animalType) : undefined
       }
     });
 
