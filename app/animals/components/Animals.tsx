@@ -5,11 +5,13 @@ import { AnimalWithRelations } from '@/types/Animal';
 import { ApplicationStatus, Gender, PublicStatus } from '@prisma/client';
 import { redirect, useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/useUserStore';
+import { animalTypeOptions, applicationStatusOptions, genderOptions, publicStatusOptions } from '@/utils/options';
 
 export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] }) => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
+    animalType: '',
     gender: '',
     applicationStatus: '',
     publicStatus: '',
@@ -27,25 +29,15 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
     setAnimals(await response.json());
   };
 
-  const genderOptions = useMemo(() => [
-    { value: '', label: '選択してください' },
-    ...Object.values(Gender).map(item => ({ value: item, label: item }))
-  ], []);
-
-  const applicationStatusOptions = useMemo(() => [
-    { value: '', label: '選択してください' },
-    ...Object.values(ApplicationStatus).map(item => ({ value: item, label: item }))
-  ], []);
-
-  const publicStatusOptions = useMemo(() => {
-    const options = [{ value: '', label: '選択してください' }];
-    Object.values(PublicStatus).forEach(item => {
-      if (item !== PublicStatus.非公開 || role === 'staff') {
-        options.push({ value: item, label: item });
+  const filterdPublicStatusOptions = useMemo(() => {
+    const options: { value: string, label: string }[] = []; // 配列として初期化
+    publicStatusOptions.forEach((opt) => {
+      if (opt.value !== PublicStatus.非公開 || role === 'staff') {
+        options.push({ value: String(opt.value), label: opt.label });
       }
     });
     return options;
-  }, [role]);
+  }, [role, publicStatusOptions]);
 
   return (
     <Container py="xl">
@@ -57,11 +49,41 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
           <Accordion.Panel>
             <form onSubmit={handleSearch}>
               <Stack>
-                <TextInput label="名前" placeholder="名前を入力" value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                <Select label="性別" value={formData.gender} onChange={(value) => setFormData({ ...formData, gender: value || '' })} data={genderOptions} />
-                <Select label="申請状況" value={formData.applicationStatus} onChange={v => setFormData({ ...formData, applicationStatus: v || '' })} data={applicationStatusOptions} />
-                <Select label="公開状況" value={formData.publicStatus} onChange={(value) => setFormData({ ...formData, publicStatus: value || '' })} data={publicStatusOptions} />
+                <TextInput
+                  label="名前"
+                  placeholder="名前を入力"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+                <Select
+                  label="種類"
+                  value={formData.animalType}
+                  onChange={value => setFormData({ ...formData, animalType: value || '' })}
+                  data={animalTypeOptions.map((opt) => ({
+                    value: String(opt.value), label: opt.label,
+                  }))}
+                />
+                <Select
+                  label="性別"
+                  value={formData.gender}
+                  onChange={(value) => setFormData({ ...formData, gender: value || '' })}
+                  data={genderOptions}
+                />
+                <Select
+                  label="申請状況"
+                  value={formData.applicationStatus}
+                  onChange={value => setFormData({ ...formData, applicationStatus: value || '' })}
+                  data={animalTypeOptions.map((opt) => ({
+                    value: String(opt.value),
+                    label: opt.label,
+                  }))}
+                />
+                <Select
+                  label="公開状況"
+                  value={formData.publicStatus}
+                  onChange={(value) => setFormData({ ...formData, publicStatus: value || '' })}
+                  data={filterdPublicStatusOptions}
+                />
                 <Button type="submit">検索</Button>
               </Stack>
             </form>
