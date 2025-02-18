@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "@mantine/form";
-import { Container, Card, Stack, Title, Group, Divider, Button, TextInput, Select, NumberInput, Textarea, Modal, } from "@mantine/core"
+import { Container, Card, Stack, Title, Group, Divider, Button, TextInput, Select, NumberInput, Textarea, Modal, Box } from "@mantine/core";
 import { FileDownloader } from "@/app/components/FileDownloader";
 import { FileUploader } from "@/app/components/FileUploader";
 import { generateFilePath } from "@/utils/path-utils";
@@ -76,22 +76,20 @@ export const Regist = ({ userId }: { userId: string }) => {
   return (
     <Container size={600} my="xl">
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Title order={2} mb="md">動物登録</Title>
+        <Title order={2} mb="md" c="blue">動物登録</Title>
         <form onSubmit={form.onSubmit(handleCreate)}>
-          <Stack>
+          <Stack gap="xl">
             <TextInput label="名前" {...form.getInputProps("name")} required />
-            <Select label="種類"
-              data={animalTypeOptions.map((opt) => ({
-                value: String(opt.value), label: opt.label,
-              }))}
-              {...form.getInputProps("animalTypeId")} />
+            <Select label="種類" data={animalTypeOptions.map(opt => ({ value: String(opt.value), label: opt.label }))} {...form.getInputProps("animalTypeId")} />
             <Select label="性別" data={genderOptions} {...form.getInputProps("gender")} />
             <NumberInput label="年齢" {...form.getInputProps("age")} min={0} />
             <Textarea label="説明" {...form.getInputProps("description")} />
             <Select label="応募状況" data={applicationStatusOptions} {...form.getInputProps("applicationStatus")} />
             <Select label="公開状況" data={publicStatusOptions} {...form.getInputProps("publicStatus")} />
-            <Group mt="md" >
-              <Button type="submit" loading={loading}>
+            <FileUploader userId={userId} onFileDataReceivedAction={onFilePathReceived} />
+            <FileDownloader filePath={filePath} downloadFileName={fileName} />
+            <Group mt="md">
+              <Button type="submit" loading={loading} size="lg" color="teal">
                 登録
               </Button>
             </Group>
@@ -111,15 +109,6 @@ export const Regist = ({ userId }: { userId: string }) => {
         <p>動物が正常に登録されました！</p>
       </Modal>
 
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Title order={3} >画像アップロード</Title>
-        <FileUploader userId={userId} onFileDataReceivedAction={onFilePathReceived} />
-      </Card>
-
-      <Card shadow="sm" padding="lg" radius="md" withBorder mt="md">
-        <Title order={3} >画像ダウンロード</Title>
-        <FileDownloader filePath={filePath} downloadFileName={fileName} />
-      </Card>
     </Container>
   );
 };

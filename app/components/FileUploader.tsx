@@ -1,7 +1,7 @@
 'use client'
 import { SignedUrlType } from "@/utils/constants";
 import { generateFilePath } from "@/utils/path-utils";
-import { Button, Group } from "@mantine/core";
+import { Button, Group, Text, Loader, Card, Box, Center } from "@mantine/core";
 import { useState } from "react";
 
 export const FileUploader: React.FC<UploadFileProps> = ({ userId, onFileDataReceivedAction }) => {
@@ -61,24 +61,37 @@ export const FileUploader: React.FC<UploadFileProps> = ({ userId, onFileDataRece
       }
     } catch (error) {
       console.error(error);
+      setUploadStatus("アップロード中にエラーが発生しました。");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>upload</button>
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Text mt="md" size="lg" style={{ weight: "500" }}>画像アップロード</Text>
 
-      <Group mt="md" >
-        <Button onClick={handleUpload} loading={loading}>
-          アップロードする
+      <input type="file" onChange={handleFileChange} accept="image/*" style={{ display: "none" }} id="file-upload" />
+      <label htmlFor="file-upload">
+        <Button component="span" size="md" variant="outline" color="teal" fullWidth>
+          ファイルを選択
         </Button>
-      </Group>
-
-      <img src={objectURL || undefined} alt="test" style={{ width: "200px", height: "200px" }} />
-      <p>{uploadStatus}</p>
-    </div>
+      </label>
+      {objectURL && (
+        <Center mt="md" style={{ border: '1px solid black' }}>
+          <img src={objectURL} alt="Selected File" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+        </Center>
+      )}
+      <Center mt="md">
+        <Button onClick={handleUpload} loading={loading} color="teal" fullWidth>
+          アップロード
+        </Button>
+      </Center>
+      {uploadStatus && (
+        <Text mt="md" c={uploadStatus.includes("成功") ? "green" : "red"}>
+          {uploadStatus}
+        </Text>
+      )}
+    </Card>
   );
 };
