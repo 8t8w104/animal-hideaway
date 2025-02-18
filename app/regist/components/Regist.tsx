@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "@mantine/form";
 import { Container, Card, Stack, Title, Group, Divider, Button, TextInput, Select, NumberInput, Textarea, Modal, Box } from "@mantine/core";
-import { FileDownloader } from "@/app/components/FileDownloader";
 import { FileUploader } from "@/app/components/FileUploader";
-import { generateFilePath } from "@/utils/path-utils";
 import { animalTypeOptions, applicationStatusOptions, genderOptions, publicStatusOptions } from "@/utils/options";
 import { Animal, ApplicationStatus, Gender, PublicStatus } from "@prisma/client";
 
 export const Regist = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [filePath, setFilePath] = useState<string>("");
-  const [fileName, setFileName] = useState<string>("");
+  const fileUploadRef = useRef<{
+    handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }>
+    clear: () => void
+  }>(null);
 
   const form = useForm({
     initialValues: {
@@ -29,6 +29,7 @@ export const Regist = ({ userId }: { userId: string }) => {
 
     validate: {
       name: (value) => (value.length > 0 ? null : "名前を入力してください"),
+      animalTypeId: (value) => (value > 0 ? null : "種類を入力してください"),
     },
   });
 
@@ -38,6 +39,10 @@ export const Regist = ({ userId }: { userId: string }) => {
 
     setLoading(true);
     try {
+
+      const uploadResult = await fileUploadRef.current?.handleUpload();
+      if (!uploadResult) throw new Error("ファイルアップロードに失敗しました");
+
       const res = await fetch("/api/regist", {
         method: "PUT",
         headers: {
@@ -47,30 +52,19 @@ export const Regist = ({ userId }: { userId: string }) => {
           {
             ...form.values,
             userId,
-            filePath,
-            fileName
+            filePath: uploadResult?.generatedFilePath || "",
+            fileName: uploadResult?.fileName || "",
           }
         ),
       });
 
-      console.log(res)
-      console.log("↑res")
-
       if (!res.ok) throw new Error("登録に失敗しました");
-      console.log("登録成功");
       setModalOpen(true);
-      form.reset();
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  };
-
-  // 子コンポーネントで生成したファイルパスを受け取る
-  const onFilePathReceived = ({ generatedFilePath, fileName }: { generatedFilePath: string, fileName: string }) => {
-    setFilePath(generatedFilePath);
-    setFileName(fileName);
   };
 
   return (
@@ -80,16 +74,27 @@ export const Regist = ({ userId }: { userId: string }) => {
         <form onSubmit={form.onSubmit(handleCreate)}>
           <Stack gap="xl">
             <TextInput label="名前" {...form.getInputProps("name")} required />
-            <Select label="種類" data={animalTypeOptions.map(opt => ({ value: String(opt.value), label: opt.label }))} {...form.getInputProps("animalTypeId")} />
-            <Select label="性別" data={genderOptions} {...form.getInputProps("gender")} />
+            <Select
+              label="種類"
+              data={animalTypeOptions.map(opt => ({ value: String(opt.value), label: opt.label }))}
+              {...form.getInputProps("animalTypeId")}
+              required
+            />
+            <Select
+              label="性別"
+              data={genderOptions}
+              {...form.getInputProps("gender")}
+            />
             <NumberInput label="年齢" {...form.getInputProps("age")} min={0} />
             <Textarea label="説明" {...form.getInputProps("description")} />
             <Select label="応募状況" data={applicationStatusOptions} {...form.getInputProps("applicationStatus")} />
             <Select label="公開状況" data={publicStatusOptions} {...form.getInputProps("publicStatus")} />
-            <FileUploader userId={userId} onFileDataReceivedAction={onFilePathReceived} />
-            <FileDownloader filePath={filePath} downloadFileName={fileName} />
+            <FileUploader
+              userId={userId}
+              ref={fileUploadRef} />
+            {/* <FileDownloader filePath={filePath} downloadFileName={fileName} /> */}
             <Group mt="md">
-              <Button type="submit" loading={loading} size="lg" color="teal">
+              <Button type="submit" loading={loading} size="lg" color="blue">
                 登録
               </Button>
             </Group>
@@ -102,7 +107,11 @@ export const Regist = ({ userId }: { userId: string }) => {
       {/* 登録成功後のモーダル */}
       <Modal
         opened={isModalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          fileUploadRef.current?.clear();
+          form.reset();
+          setModalOpen(false)
+        }}
         title="登録完了"
         centered
       >
