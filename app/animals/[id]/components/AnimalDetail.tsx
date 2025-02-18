@@ -19,6 +19,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const { role, userId } = useUserStore()
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -37,7 +38,9 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   };
 
   const handleDelete = async () => {
+    setLoading(true)
     const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
+    setLoading(false)
     if (res.ok) {
       router.push('/');
     }
@@ -112,7 +115,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                       { value: '非公開', label: '非公開' },
                     ]}
                   />
-                  <Button onClick={handleUpdate} color="blue">更新</Button>
+                  <Button loading={loading} onClick={handleUpdate} color="blue">更新</Button>
                   <Button onClick={() => setIsEditing(false)} color="gray">キャンセル</Button>
                 </>
               ) : (
@@ -127,7 +130,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                   {role === Role.Staff && (
                     <>
                       <Button onClick={() => setIsEditing(true)} color="blue">編集</Button>
-                      <Button onClick={handleDelete} color="red">削除</Button>
+                      <Button loading={loading} onClick={handleDelete} color="red">削除</Button>
                     </>
                   )}
                 </>
