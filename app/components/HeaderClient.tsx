@@ -13,7 +13,7 @@ import {
   Stack
 } from '@mantine/core';
 import { useUserStore } from "@/store/useUserStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IconPaw } from "@tabler/icons-react";
 import { Role } from "@/utils/constants";
 import { useDisclosure } from "@mantine/hooks";
@@ -27,6 +27,8 @@ const navItems = [
 export const HeaderClient = ({ user }: { user: User | null }) => {
   const { setUserId, setRole } = useUserStore();
   const [opened, { toggle, close }] = useDisclosure(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const role = user?.user_metadata?.role;
   const userId = user?.id;
 
@@ -40,9 +42,16 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
     }
   }, [role, setRole, userId, setUserId]);
 
-  const handleSignOutClick = () => {
-    signOutAction();
-    close();
+  const handleSignOutClick = async () => {
+    setLoading(true);
+    try {
+      await signOutAction();
+    } catch (error) {
+      console.error("サインアウトに失敗しました failed", error);
+    } finally {
+      setLoading(false);
+      close()
+    }
   };
 
   return (
@@ -90,7 +99,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
                 <Avatar src={user?.user_metadata?.avatar_url} radius="xl" />
                 <Text>{user.email}</Text>
               </Group>
-              <Button onClick={handleSignOutClick} color="red" fullWidth>
+              <Button onClick={handleSignOutClick} color="red" fullWidth loading={loading}>
                 サインアウト
               </Button>
             </>
@@ -115,7 +124,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
           )
         ))}
         {user ? (
-          <Button onClick={handleSignOutClick} color="red">
+          <Button onClick={handleSignOutClick} color="red" loading={loading}>
             サインアウト
           </Button>
         ) : (

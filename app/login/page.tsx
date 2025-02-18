@@ -24,6 +24,7 @@ import { createSupabaseClient } from "@/utils/supabase/client";
 
 export default function Page() {
   const [isNewAccount, setIsNewAccount] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false)
 
   const form = useForm({
     initialValues: {
@@ -39,8 +40,10 @@ export default function Page() {
     },
   });
 
-  const registOrLogin = (formValue: typeof form.values) => {
-    isNewAccount ? signup(formValue) : login(formValue)
+  const registOrLogin = async (formValue: typeof form.values) => {
+    setLoading(true)
+    isNewAccount ? await signup(formValue) : await login(formValue)
+    setLoading(false)
   }
 
 
@@ -83,8 +86,7 @@ export default function Page() {
           <Text size="xl" style={{ weight: "600" }} mb="sm">
             {isNewAccount ? '新規登録' : 'ログイン'}
           </Text>
-          {/* <form onSubmit={form.onSubmit(registOrLogin)}> */}
-          <form onSubmit={form.onSubmit((formValue) => isNewAccount ? signup(formValue) : login(formValue))}>
+          <form onSubmit={form.onSubmit(registOrLogin)}>
             {isNewAccount &&
               <>
                 <Stack
@@ -179,7 +181,7 @@ export default function Page() {
                 </Text>
               }
 
-              <Button type="submit" radius="xl" size="lg" fullWidth>
+              <Button type="submit" radius="xl" size="lg" fullWidth loading={loading}>
                 {isNewAccount ? '新規登録' : 'ログイン'}
               </Button>
             </Stack>
