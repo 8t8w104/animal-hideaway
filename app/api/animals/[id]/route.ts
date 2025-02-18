@@ -103,6 +103,8 @@ export async function DELETE(req: NextRequest) {
     await prisma.animal.delete({ where: { id: Number(id) } });
     return NextResponse.json({ message: "動物が削除されました。" });
   } catch (error) {
+    console.log(JSON.stringify(error))
+    console.log("↑JSON.stringify(error)")
     return NextResponse.json({ error: "削除に失敗しました。" }, { status: 500 });
   }
 }
