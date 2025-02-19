@@ -12,18 +12,23 @@ interface ExtendedFormData {
   name?: string;
 }
 
-export async function login(formData: ExtendedFormData) {
+export async function signup(formData: ExtendedFormData) {
   const supabase = await createClient()
+  const { email, password, userType, name } = formData;
 
-  const { email, password } = formData;
 
   const data = {
     email,
     password,
+    options: {
+      data: {
+        name,
+        role: userType
+      },
+    },
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
-
+  const { error } = await supabase.auth.signUp(data)
   if (error) {
     const errorMessage = encodeURIComponent(error.message);
     redirect(`/error?message=${errorMessage}`);
