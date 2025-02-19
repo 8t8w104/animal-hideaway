@@ -104,11 +104,18 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
               </Button>
             </>
           ) : (
-            <Button onClick={() => {
-              close()
-              router.push("/login")
+            <>
+              <Button onClick={() => {
+                close()
+                router.push("/login")
 
-            }}>ログイン / 新規登録</Button>
+              }}>ログイン</Button>
+              <Button onClick={() => {
+                close()
+                router.push("/sign-up")
+
+              }}>新規登録</Button>
+            </>
           )}
         </Stack>
       </Drawer>
@@ -128,11 +135,18 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
             サインアウト
           </Button>
         ) : (
-          <Link href="/login">
-            <Button onClick={close}>
-              ログイン / 新規登録
-            </Button>
-          </Link>
+          <>
+            <Link href="/login">
+              <Button onClick={close}>
+                ログイン
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button onClick={close}>
+                新規登録
+              </Button>
+            </Link>
+          </>
         )}
       </Group>
     </Box>
