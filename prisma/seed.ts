@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.local.env' });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 async function main() {
   // 動物の種類を作成
@@ -15,23 +17,23 @@ async function main() {
     ],
   });
 
-  // 個人ユーザーを作成
-  const individuals = await prisma.individual.createMany({
-    data: [
-      { individualId: 'indiv_001' },
-      { individualId: 'indiv_002' },
-      { individualId: 'indiv_003' },
-    ],
-  });
+  // // 個人ユーザーを作成
+  // const individuals = await prisma.individual.createMany({
+  //   data: [
+  //     { individualId: 'indiv_001' },
+  //     { individualId: 'indiv_002' },
+  //     { individualId: 'indiv_003' },
+  //   ],
+  // });
 
-  // 団体を作成
-  const organizations = await prisma.organization.createMany({
-    data: [
-      { organizationId: 'org_001' },
-      { organizationId: 'org_002' },
-      { organizationId: 'org_003' },
-    ],
-  });
+  // // 団体を作成
+  // const organizations = await prisma.organization.createMany({
+  //   data: [
+  //     { organizationId: 'org_001' },
+  //     { organizationId: 'org_002' },
+  //     { organizationId: 'org_003' },
+  //   ],
+  // });
 
   // 動物を作成
   const animals = await prisma.animal.createMany({
