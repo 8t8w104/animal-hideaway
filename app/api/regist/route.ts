@@ -30,7 +30,6 @@ export async function PUT(req: NextRequest) {
       data: {
         animalId: animal.id,
         organizationId: body.userId,
-        userId: body.userId
       },
     })
     console.log(organizationAnimal)
