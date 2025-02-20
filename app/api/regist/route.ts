@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { Animal } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 export async function PUT(req: NextRequest) {
   const body = await req.json();
@@ -27,7 +29,7 @@ export async function PUT(req: NextRequest) {
     const organizationAnimal = await prisma.organizationAnimal.create({
       data: {
         animalId: animal.id,
-        organizationId: "org_001",
+        organizationId: body.userId,
         userId: body.userId
       },
     })

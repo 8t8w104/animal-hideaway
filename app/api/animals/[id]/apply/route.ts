@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApplicationStatus, Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 export async function POST(req: NextRequest) {
   console.log("api/animals/id/apply/route.ts")
@@ -45,18 +47,18 @@ export async function POST(req: NextRequest) {
     const date = new Date()
 
     const adoptionApplication = {
-      animal: { connect: { id: Number(id) } },
-      individual: { connect: { individualId: body.userId } },
+      animalId: Number(id),
+      individualId: body.userId,
       applicationDate: date,
       notes: "この動物をぜひ引き取りたいです！",
       createdAt: date,
       updatedAt: date,
       createdBy: body.userId,
-      updatedBy: body.userId
+      updatedBy: body.userId,
     }
 
+    const newApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
 
-    // const newApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
 
 
     // console.log(`body.userId=${body.userId}`)
@@ -75,11 +77,11 @@ export async function POST(req: NextRequest) {
     // })
 
 
-    // console.log(newApplication)
+    console.log(newApplication)
     console.log("after adoptionApplication.create")
 
-    // return NextResponse.json(newApplication);
-    return NextResponse.json([]);
+    return NextResponse.json(newApplication);
+    // return NextResponse.json([]);
   } catch (error) {
     console.log("↓error")
     // console.log(error)

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { getSupabaseSignedUrl } from "@/utils/supabase";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.pathname.split('/').pop();
