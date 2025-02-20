@@ -26,15 +26,23 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   };
 
   const handleUpdate = async () => {
-    const res = await fetch(`/api/animals/${animal.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    if (res.ok) {
-      router.refresh();
-      setIsEditing(false);
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/animals/${animal.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        router.refresh();
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
+
   };
 
   const handleDelete = async () => {
@@ -143,7 +151,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         {role === Role.General &&
           <Center>
             <Group style={{ marginTop: '20px' }}>
-              <Button color="green" size="lg" onClick={handleApply}>応募する</Button>
+              <Button color="green" size="lg" onClick={handleApply} loading={loading}>応募する</Button>
             </Group>
           </Center>
         }

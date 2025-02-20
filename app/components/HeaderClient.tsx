@@ -131,9 +131,15 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
           )
         ))}
         {user ? (
-          <Button onClick={handleSignOutClick} color="red" loading={loading}>
-            サインアウト
-          </Button>
+          <>
+            <Group>
+              <Avatar src={user?.user_metadata?.avatar_url} radius="xl" />
+              <Text>{user.email}</Text>
+            </Group>
+            <Button onClick={handleSignOutClick} color="red" loading={loading}>
+              サインアウト
+            </Button>
+          </>
         ) : (
           <>
             <Link href="/login">
