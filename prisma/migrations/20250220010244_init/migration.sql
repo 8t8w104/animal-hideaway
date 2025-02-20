@@ -35,7 +35,7 @@ CREATE TABLE "public"."AnimalType" (
 -- CreateTable
 CREATE TABLE "public"."Individual" (
     "id" SERIAL NOT NULL,
-    "individualId" TEXT NOT NULL,
+    "individualId" UUID NOT NULL,
 
     CONSTRAINT "Individual_pkey" PRIMARY KEY ("id")
 );
@@ -43,7 +43,7 @@ CREATE TABLE "public"."Individual" (
 -- CreateTable
 CREATE TABLE "public"."Organization" (
     "id" SERIAL NOT NULL,
-    "organizationId" TEXT NOT NULL,
+    "organizationId" UUID NOT NULL,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
 );
@@ -52,8 +52,8 @@ CREATE TABLE "public"."Organization" (
 CREATE TABLE "public"."InquiryMeta" (
     "id" SERIAL NOT NULL,
     "animalId" INTEGER NOT NULL,
-    "individualId" TEXT NOT NULL,
-    "organizationId" TEXT NOT NULL,
+    "individualId" UUID NOT NULL,
+    "organizationId" UUID NOT NULL,
 
     CONSTRAINT "InquiryMeta_pkey" PRIMARY KEY ("id")
 );
@@ -73,7 +73,7 @@ CREATE TABLE "public"."InquiryContent" (
 -- CreateTable
 CREATE TABLE "public"."IndividualAnimal" (
     "id" SERIAL NOT NULL,
-    "individualId" TEXT NOT NULL,
+    "individualId" UUID NOT NULL,
     "animalId" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
 
@@ -83,7 +83,7 @@ CREATE TABLE "public"."IndividualAnimal" (
 -- CreateTable
 CREATE TABLE "public"."OrganizationAnimal" (
     "id" SERIAL NOT NULL,
-    "organizationId" TEXT NOT NULL,
+    "organizationId" UUID NOT NULL,
     "animalId" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
 
@@ -109,13 +109,13 @@ CREATE TABLE "public"."Image" (
 CREATE TABLE "public"."AdoptionApplication" (
     "id" SERIAL NOT NULL,
     "animalId" INTEGER NOT NULL,
-    "individualId" TEXT NOT NULL,
+    "individualId" UUID NOT NULL,
     "applicationDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT NOT NULL,
-    "updatedBy" TEXT NOT NULL,
+    "createdBy" UUID NOT NULL,
+    "updatedBy" UUID NOT NULL,
 
     CONSTRAINT "AdoptionApplication_pkey" PRIMARY KEY ("id")
 );
@@ -128,6 +128,9 @@ CREATE UNIQUE INDEX "Individual_individualId_key" ON "public"."Individual"("indi
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Organization_organizationId_key" ON "public"."Organization"("organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AdoptionApplication_animalId_individualId_key" ON "public"."AdoptionApplication"("animalId", "individualId");
 
 -- AddForeignKey
 ALTER TABLE "public"."Animal" ADD CONSTRAINT "Animal_animalTypeId_fkey" FOREIGN KEY ("animalTypeId") REFERENCES "public"."AnimalType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -151,10 +154,10 @@ ALTER TABLE "public"."IndividualAnimal" ADD CONSTRAINT "IndividualAnimal_individ
 ALTER TABLE "public"."IndividualAnimal" ADD CONSTRAINT "IndividualAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("organizationId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."Organization"("organizationId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."OrganizationAnimal" ADD CONSTRAINT "OrganizationAnimal_animalId_fkey" FOREIGN KEY ("animalId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Image" ADD CONSTRAINT "Image_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "public"."Animal"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -167,3 +170,6 @@ ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_i
 
 -- AddForeignKey
 ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "public"."Individual"("individualId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."AdoptionApplication" ADD CONSTRAINT "AdoptionApplication_updatedBy_fkey" FOREIGN KEY ("updatedBy") REFERENCES "public"."Individual"("individualId") ON DELETE RESTRICT ON UPDATE CASCADE;

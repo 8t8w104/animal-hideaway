@@ -79,19 +79,20 @@ model AnimalType {
 
 model Individual {
   id  Int @id @default(autoincrement()) 
-  individualId String @unique 
+  individualId String @unique @db.Uuid
 
   InquiryMeta InquiryMeta[]
   IndividualAnimal IndividualAnimal[]
   applicant AdoptionApplication[] @relation("Applicant")
   creator AdoptionApplication[] @relation("Creator")
+  updator AdoptionApplication[] @relation("Updator")
 
   @@schema("public")
 }
 
 model Organization {
   id  Int @id @default(autoincrement()) 
-  organizationId String @unique 
+  organizationId String @unique @db.Uuid
 
   InquiryMeta InquiryMeta[]
   OrganizationAnimal OrganizationAnimal[]
@@ -103,8 +104,8 @@ model Organization {
 model InquiryMeta {
   id  Int @id @default(autoincrement()) 
   animalId Int
-  individualId String
-  organizationId String
+  individualId String @db.Uuid
+  organizationId String @db.Uuid
 
   animal  Animal  @relation(fields: [animalId], references: [id])
   individual  Individual  @relation(fields: [individualId], references: [individualId])
@@ -130,7 +131,7 @@ model InquiryContent {
 
 model IndividualAnimal {
   id  Int @id @default(autoincrement()) 
-  individualId String
+  individualId String @db.Uuid
   animalId Int
   userId String
 
@@ -142,7 +143,7 @@ model IndividualAnimal {
 
 model OrganizationAnimal {
   id  Int @id @default(autoincrement()) 
-  organizationId String
+  organizationId String @db.Uuid
   animalId Int
   userId String
 
@@ -171,19 +172,21 @@ model Image {
 
 model AdoptionApplication {
   id  Int @id @default(autoincrement()) 
-  animalId Int 
-  individualId String
+  animalId Int
+  individualId String @db.Uuid
   applicationDate DateTime @default(now())
   notes String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String
-  updatedBy String
+  createdBy String @db.Uuid
+  updatedBy String @db.Uuid
 
   animal  Animal  @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
   individual      Individual @relation("Applicant", fields: [individualId], references: [individualId])
   creator         Individual @relation("Creator", fields: [createdBy], references: [individualId])
+  updator         Individual @relation("Updator", fields: [updatedBy], references: [individualId])
 
+  @@unique([animalId, individualId])
   @@schema("public")
 }
