@@ -38,7 +38,13 @@ export async function GET(req: NextRequest) {
             contentType: true,
             publicFlag: true,
           }
-        }
+        },
+        _count: {
+          select: {
+            IndividualAnimal: true,
+            AdoptionApplication: true,
+          }
+        },
       },
     });
 

@@ -1,8 +1,8 @@
 'use client';
 import Image from 'next/image';
-import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center } from '@mantine/core';
+import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center, ActionIcon, Tooltip, Loader } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/useUserStore";
@@ -20,6 +20,9 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const [isEditing, setIsEditing] = useState(false);
   const { role, userId } = useUserStore()
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingFavorite, setLoadingFavorite] = useState<boolean>(false);
+  const [favorited, setFavorited] = useState(animal._count.IndividualAnimal ? true : false);
+  const [applied, setApplied] = useState(animal._count.AdoptionApplication ? true : false);
 
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -47,23 +50,61 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
   const handleDelete = async () => {
     setLoading(true)
-    const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
-    setLoading(false)
-    if (res.ok) {
-      router.push('/');
+    try {
+      const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        router.push('/');
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
   };
 
-  const handleApply = async () => {
-    const res = await fetch(`/api/animals/${animal.id}/apply`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
-    });
-    if (res.ok) {
-      router.refresh();
-      setIsEditing(false);
+  const handleFavorite = async () => {
+    setLoadingFavorite(true);
+    try {
+      const res = await fetch(`/api/animals/${animal.id}/favorite`, {
+        method: favorited ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (res.ok) {
+        setLoadingFavorite(prev => !prev);
+        setFavorited(prev => !prev);
+        router.refresh();
+      }
+
+    } catch (error) {
+      console.error('お気に入り操作エラー', error);
     }
+    setLoading(false);
+  };
+
+  const handleApply = async () => {
+    setLoading(true)
+    try {
+
+      const res = await fetch(`/api/animals/${animal.id}/apply`, {
+        method: applied ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (res.ok) {
+        setApplied(prev => !prev);
+        setFavorited(prev => !prev);
+        router.refresh();
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+
   }
 
   return (
@@ -147,11 +188,33 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           </Grid.Col>
         </Grid>
 
-        {/* 応募するボタン */}
+        {/* お気に入り、応募 */}
         {role === Role.General &&
           <Center>
             <Group style={{ marginTop: '20px' }}>
-              <Button color="green" size="lg" onClick={handleApply} loading={loading}>応募する</Button>
+              <Tooltip label={favorited ? 'お気に入り解除' : 'お気に入り登録'} withArrow>
+                <ActionIcon
+                  variant="transparent"
+                  color={loadingFavorite ? 'yellow' : 'gray'}
+                  size="xl"
+                  onClick={handleFavorite}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader size={24} color={loadingFavorite ? 'yellow' : 'gray'} />
+                  ) : (
+                    loadingFavorite ? <IconStarFilled size={24} /> : <IconStar size={24} />
+                  )}
+                </ActionIcon>
+              </Tooltip>
+              <Button
+                color={applied ? 'gray' : 'green'}
+                size="lg"
+                onClick={handleApply}
+                loading={loading}
+              >
+                {applied ? '応募済み' : '応募する'}
+              </Button>
             </Group>
           </Center>
         }
