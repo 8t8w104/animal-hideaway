@@ -200,10 +200,10 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                   onClick={handleFavorite}
                   disabled={loading}
                 >
-                  {loading ? (
-                    <Loader size={24} color={loadingFavorite ? 'yellow' : 'gray'} />
+                  {loadingFavorite ? (
+                    <Loader size={24} color={favorited ? 'yellow' : 'gray'} />
                   ) : (
-                    loadingFavorite ? <IconStarFilled size={24} /> : <IconStar size={24} />
+                    favorited ? <IconStarFilled size={24} /> : <IconStar size={24} />
                   )}
                 </ActionIcon>
               </Tooltip>
