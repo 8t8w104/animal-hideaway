@@ -133,11 +133,11 @@ model IndividualAnimal {
   id  Int @id @default(autoincrement()) 
   individualId String @db.Uuid
   animalId Int
-  userId String
 
   individual  Individual  @relation(fields: [individualId], references: [individualId]) 
   animal  Animal  @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
+  @@unique([animalId, individualId])
   @@schema("public")
 }
 
@@ -145,11 +145,11 @@ model OrganizationAnimal {
   id  Int @id @default(autoincrement()) 
   organizationId String @db.Uuid
   animalId Int
-  userId String
 
   organization  Organization  @relation(fields: [organizationId], references: [organizationId])
   animal  Animal  @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
+  @@unique([animalId, organizationId])
   @@schema("public")
 }
 
