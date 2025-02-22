@@ -42,33 +42,63 @@ export async function POST(req: NextRequest) {
     });
 
     console.log("before IndividualAnimal.create")
-    await prisma.individualAnimal.create({
-      data: {
-        individualId: body.userId,
+
+    // 既に登録されているかを確認
+    const countIndividualAnimal = await prisma.individualAnimal.count({
+      where: {
         animalId: Number(id),
-      }
-    })
+        individualId: body.userId,
+      },
+    });
 
-    console.log("before adoptionApplication.create")
-    const date = new Date()
-
-    const adoptionApplication = {
-      animalId: Number(id),
-      individualId: body.userId,
-      applicationDate: date,
-      notes: "",
-      createdAt: date,
-      updatedAt: date,
-      createdBy: body.userId,
-      updatedBy: body.userId,
+    let createIndividualAnimal
+    if (countIndividualAnimal === 0) {
+      createIndividualAnimal = await prisma.individualAnimal.create({
+        data: {
+          individualId: body.userId,
+          animalId: Number(id),
+        }
+      })
     }
 
-    const newApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
+    console.log("before adoptionApplication.create")
 
-    console.log(newApplication)
+    // 既に登録されているかを確認
+    const countAdoptionApplication = await prisma.adoptionApplication.count({
+      where: {
+        animalId: Number(id),
+        individualId: body.userId,
+      },
+    });
+
+    let createApplication
+    if (countAdoptionApplication === 0) {
+      const date = new Date()
+
+      const adoptionApplication = {
+        animalId: Number(id),
+        individualId: body.userId,
+        applicationDate: date,
+        notes: "",
+        createdAt: date,
+        updatedAt: date,
+        createdBy: body.userId,
+        updatedBy: body.userId,
+      }
+
+      createApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
+    }
+
     console.log("after adoptionApplication.create")
 
-    return NextResponse.json(newApplication);
+    console.log(createApplication)
+    console.log("↑createApplication")
+
+    return NextResponse.json({
+      message: "応募完了しました。",
+      isApplicationProcessed: createApplication ? true : false,
+      isFavoriteProcessed: createIndividualAnimal ? true : false,
+    });
   } catch (error) {
     console.log("↓error")
     console.log(JSON.stringify(error)); // this will not cause any issue
@@ -100,27 +130,53 @@ export async function DELETE(req: NextRequest) {
 
   try {
     // 1. AdoptionApplication を削除する
-    const deleteApplication = await prisma.adoptionApplication.delete({
+
+    // 既に登録されているかを確認
+    const countAdoptionApplication = await prisma.adoptionApplication.count({
       where: {
-        animalId_individualId: {
-          animalId: Number(id),
-          individualId: body.userId,
-        }
+        animalId: Number(id),
+        individualId: body.userId,
       },
     });
-    console.log("deleteApplication:", deleteApplication);
+
+    let deleteApplication
+    if (countAdoptionApplication === 1) {
+
+      deleteApplication = await prisma.adoptionApplication.delete({
+        where: {
+          animalId_individualId: {
+            animalId: Number(id),
+            individualId: body.userId,
+          }
+        },
+      });
+      console.log("deleteApplication:", deleteApplication);
+    }
+
 
     // 2. IndividualAnimal を削除する
-    const deleteIndividualAnimal = await prisma.individualAnimal.delete({
+
+    // 既に登録されているかを確認
+    const countIndividualAnimal = await prisma.individualAnimal.count({
       where: {
-        animalId_individualId: {
-          animalId: Number(id),
-          individualId: body.userId,
-        }
+        animalId: Number(id),
+        individualId: body.userId,
       },
     });
 
-    console.log("deleteIndividualAnimal:", deleteIndividualAnimal);
+    let deleteIndividualAnimal
+    if (countIndividualAnimal === 1) {
+      deleteIndividualAnimal = await prisma.individualAnimal.delete({
+        where: {
+          animalId_individualId: {
+            animalId: Number(id),
+            individualId: body.userId,
+          }
+        },
+      });
+
+      console.log("deleteIndividualAnimal:", deleteIndividualAnimal);
+    }
 
     // 3. 必要であれば、Animal の applicationStatus を「募集中」に戻す
     await prisma.animal.update({
@@ -128,11 +184,12 @@ export async function DELETE(req: NextRequest) {
       data: { applicationStatus: ApplicationStatus.募集中 },
     });
     console.log("Animal status updated to 募集中");
-
+    console.log(deleteApplication)
+    console.log("↑deleteApplication")
     return NextResponse.json({
       message: "応募解除しました。",
-      deleteApplication,
-      deleteIndividualAnimal,
+      isApplicationProcessed: deleteApplication ? true : false,
+      isFavoriteProcessed: deleteIndividualAnimal ? true : false,
     });
   } catch (error) {
     console.error("応募解除エラー:", JSON.stringify(error));
