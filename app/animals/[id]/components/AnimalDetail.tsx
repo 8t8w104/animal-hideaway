@@ -72,15 +72,22 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       });
 
       if (res.ok) {
-        setLoadingFavorite(prev => !prev);
-        setFavorited(prev => !prev);
+
+        const data = await res.json();
+        if (data.isFavoriteProcessed) {
+          setFavorited(prev => !prev);
+        }
+
         router.refresh();
       }
 
     } catch (error) {
       console.error('お気に入り操作エラー', error);
+    } finally {
+      setLoadingFavorite(prev => !prev);
+      setLoading(false);
     }
-    setLoading(false);
+
   };
 
   const handleApply = async () => {
@@ -94,8 +101,15 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       });
 
       if (res.ok) {
-        setApplied(prev => !prev);
-        setFavorited(prev => !prev);
+        const data = await res.json();
+        console.log(data)
+
+        if (data.isApplicationProcessed) {
+          setApplied(prev => !prev);
+        }
+        if (data.isFavoriteProcessed) {
+          setFavorited(prev => !prev);
+        }
         router.refresh();
         setIsEditing(false);
       }
@@ -195,10 +209,10 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
               <Tooltip label={favorited ? 'お気に入り解除' : 'お気に入り登録'} withArrow>
                 <ActionIcon
                   variant="transparent"
-                  color={loadingFavorite ? 'yellow' : 'gray'}
+                  color={favorited ? 'yellow' : 'gray'}
                   size="xl"
                   onClick={handleFavorite}
-                  disabled={loading}
+                  disabled={loadingFavorite}
                 >
                   {loadingFavorite ? (
                     <Loader size={24} color={favorited ? 'yellow' : 'gray'} />
