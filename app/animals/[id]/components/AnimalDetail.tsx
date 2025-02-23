@@ -21,8 +21,8 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const { role, userId } = useUserStore()
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingFavorite, setLoadingFavorite] = useState<boolean>(false);
-  const [favorited, setFavorited] = useState(animal._count.IndividualAnimal ? true : false);
-  const [applied, setApplied] = useState(animal._count.AdoptionApplication ? true : false);
+  const [favorited, setFavorited] = useState(animal._count?.IndividualAnimal ? true : false);
+  const [applied, setApplied] = useState(animal._count?.AdoptionApplication ? true : false);
 
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
@@ -140,7 +140,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           </Grid.Col>
           <Grid.Col span={12}>
             <Stack mt="md">
-              <Text size="sm" color="dimmed">ID: {animal.id}</Text>
+              <Text size="sm" c="dimmed">ID: {animal.id}</Text>
               {isEditing ? (
                 <>
                   <TextInput label="名前" value={formData.name} onChange={(e) => handleChange('name', e.target.value)} />
