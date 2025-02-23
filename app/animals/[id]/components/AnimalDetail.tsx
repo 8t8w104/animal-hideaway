@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/useUserStore";
 import { Role } from '@/utils/constants';
+import { ApplicationStatus } from '@prisma/client';
 
 export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const router = useRouter();
@@ -19,17 +20,28 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const { role, userId } = useUserStore()
-  const [loading, setLoading] = useState<boolean>(false);
-  const [loadingFavorite, setLoadingFavorite] = useState<boolean>(false);
-  const [favorited, setFavorited] = useState(animal._count?.IndividualAnimal ? true : false);
-  const [applied, setApplied] = useState(animal._count?.AdoptionApplication ? true : false);
+
+  const [loadingStates, setLoadingStates] = useState({
+    update: false,
+    delete: false,
+    favorite: false,
+    apply: false,
+    decide: false,
+  });
+
+  const [status, setStatus] = useState({
+    favorite: animal._count.IndividualAnimal > 0,
+    application: animal._count.AdoptionApplication > 0,
+    decided: animal.applicationStatus === ApplicationStatus.決定,
+  });
 
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
 
+  // 動物編集（職員）
   const handleUpdate = async () => {
-    setLoading(true)
+    setLoadingStates(prev => ({ ...prev, update: true }));
     try {
       const res = await fetch(`/api/animals/${animal.id}`, {
         method: 'PUT',
@@ -43,13 +55,14 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     } catch (error) {
       console.log(error)
     } finally {
-      setLoading(false)
+      setLoadingStates(prev => ({ ...prev, update: false }));
     }
 
   };
 
+  // 動物削除（職員）
   const handleDelete = async () => {
-    setLoading(true)
+    setLoadingStates(prev => ({ ...prev, delete: true }));
     try {
       const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -58,15 +71,43 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     } catch (error) {
       console.log(error)
     } finally {
-      setLoading(false)
+      setLoadingStates(prev => ({ ...prev, delete: false }));
     }
   };
 
+
+  // 職員操作：ステータス更新（審査中→決定）
+  const handleDecided = async () => {
+    setLoadingStates(prev => ({ ...prev, decide: true }));
+    try {
+
+      const res = await fetch(`/api/animals/${animal.id}/decided`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          decided: status.decided,
+        }),
+      });
+
+      if (res.ok) {
+        setStatus(prev => ({ ...prev, decided: !prev.decided }));
+        router.refresh();
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoadingStates(prev => ({ ...prev, decide: false }));
+    }
+  }
+
+  // お気に入り（一般）
   const handleFavorite = async () => {
-    setLoadingFavorite(true);
+    setLoadingStates(prev => ({ ...prev, favorite: true }));
     try {
       const res = await fetch(`/api/animals/${animal.id}/favorite`, {
-        method: favorited ? 'DELETE' : 'POST',
+        method: status.favorite ? 'DELETE' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       });
@@ -75,7 +116,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
         const data = await res.json();
         if (data.isFavoriteProcessed) {
-          setFavorited(prev => !prev);
+          setStatus(prev => ({ ...prev, favorite: !prev.favorite }));
         }
 
         router.refresh();
@@ -84,18 +125,18 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     } catch (error) {
       console.error('お気に入り操作エラー', error);
     } finally {
-      setLoadingFavorite(prev => !prev);
-      setLoading(false);
+      setLoadingStates(prev => ({ ...prev, favorite: false }));
     }
 
   };
 
+  // 一般ユーザ操作：ステータス更新（募集中→審査中）
   const handleApply = async () => {
-    setLoading(true)
+    setLoadingStates(prev => ({ ...prev, apply: true }))
     try {
 
       const res = await fetch(`/api/animals/${animal.id}/apply`, {
-        method: applied ? 'DELETE' : 'POST',
+        method: status.application ? 'DELETE' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       });
@@ -105,10 +146,10 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         console.log(data)
 
         if (data.isApplicationProcessed) {
-          setApplied(prev => !prev);
+          setStatus(prev => ({ ...prev, application: !prev.application }));
         }
         if (data.isFavoriteProcessed) {
-          setFavorited(prev => !prev);
+          setStatus(prev => ({ ...prev, favorite: !prev.favorite }));
         }
         router.refresh();
         setIsEditing(false);
@@ -116,7 +157,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     } catch (error) {
       console.log(error)
     } finally {
-      setLoading(false)
+      setLoadingStates(prev => ({ ...prev, apply: false }))
     }
 
   }
@@ -178,8 +219,6 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                       { value: '非公開', label: '非公開' },
                     ]}
                   />
-                  <Button loading={loading} onClick={handleUpdate} color="blue">更新</Button>
-                  <Button onClick={() => setIsEditing(false)} color="gray">キャンセル</Button>
                 </>
               ) : (
                 <>
@@ -190,12 +229,6 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                   <Text>性別: {animal.gender || '未設定'}</Text>
                   <Text>応募ステータス: {animal.applicationStatus || '未設定'}</Text>
                   <Text>公開ステータス: {animal.publicStatus || '未設定'}</Text>
-                  {role === Role.Staff && (
-                    <>
-                      <Button onClick={() => setIsEditing(true)} color="blue">編集</Button>
-                      <Button loading={loading} onClick={handleDelete} color="red">削除</Button>
-                    </>
-                  )}
                 </>
               )}
             </Stack>
@@ -206,32 +239,72 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         {role === Role.General &&
           <Center>
             <Group style={{ marginTop: '20px' }}>
-              <Tooltip label={favorited ? 'お気に入り解除' : 'お気に入り登録'} withArrow>
+              <Tooltip label={status.favorite ? 'お気に入り解除' : 'お気に入り登録'} withArrow>
                 <ActionIcon
                   variant="transparent"
-                  color={favorited ? 'yellow' : 'gray'}
+                  color={status.favorite ? 'yellow' : 'gray'}
                   size="xl"
                   onClick={handleFavorite}
-                  disabled={loadingFavorite}
+                  disabled={loadingStates.favorite}
                 >
-                  {loadingFavorite ? (
-                    <Loader size={24} color={favorited ? 'yellow' : 'gray'} />
+                  {loadingStates.favorite ? (
+                    <Loader size={24} color={status.favorite ? 'yellow' : 'gray'} />
                   ) : (
-                    favorited ? <IconStarFilled size={24} /> : <IconStar size={24} />
+                    status.favorite ? <IconStarFilled size={24} /> : <IconStar size={24} />
                   )}
                 </ActionIcon>
               </Tooltip>
               <Button
-                color={applied ? 'gray' : 'green'}
+                color={status.application ? 'gray' : 'green'}
                 size="lg"
                 onClick={handleApply}
-                loading={loading}
+                loading={loadingStates.apply}
               >
-                {applied ? '応募済み' : '応募する'}
+                {status.application ? '応募済み' : '応募する'}
               </Button>
             </Group>
           </Center>
         }
+
+        {role === Role.Staff && (
+          <>
+            <Center>
+              <Text size="sm" color="dimmed" mt="xl">動物情報の編集や削除はこちら</Text>
+            </Center>
+            <Center>
+              <Group>
+                {isEditing ? (
+                  <>
+                    <Button size="lg" loading={loadingStates.update} onClick={handleUpdate} color="blue">更新する</Button>
+                    <Button size="lg" onClick={() => setIsEditing(false)} color="gray">やっぱりやめる</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="lg" onClick={() => setIsEditing(true)} color="blue">編集する</Button>
+                    <Button size="lg" loading={loadingStates.delete} onClick={handleDelete} color="red">削除する</Button>
+                  </>
+                )}
+              </Group>
+            </Center>
+
+            <Center>
+              <Text size="sm" color="dimmed" mt="xl">応募者の決定はこちら</Text>
+            </Center>
+            <Center>
+              <Group style={{ marginTop: '20px' }}>
+                <Button
+                  color={status.decided ? 'orange' : 'green'}
+                  size="lg"
+                  onClick={handleDecided}
+                  loading={loadingStates.decide}
+                >
+                  {status.decided ? '決定を取り消す' : 'この人に決める'}
+                </Button>
+                {status.decided && <Text size="sm" c="dimmed">（審査中の状態に戻します）</Text>}
+              </Group>
+            </Center>
+          </>
+        )}
 
       </Card>
     </Container>
