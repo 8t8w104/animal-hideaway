@@ -8,44 +8,58 @@ const prisma = new PrismaClient({
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.pathname.split('/').pop();
+  const userId = req.nextUrl.searchParams.get('userId');
 
   if (!id) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
   }
 
+  const baseSelect = {
+    id: true,
+    name: true,
+    gender: true,
+    description: true,
+    applicationStatus: true,
+    publicStatus: true,
+    animalType: {
+      select: {
+        id: true,
+        type: true,
+      },
+    },
+    Image: {
+      select: {
+        parentId: true,
+        imageUrl: true,
+        fileName: true,
+        path: true,
+        contentType: true,
+        publicFlag: true,
+      },
+    },
+  };
+
+  // userIdが存在する場合のみ_countをselectに追加
+  const selectObject = userId
+    ? {
+      ...baseSelect,
+      _count: {
+        select: {
+          IndividualAnimal: {
+            where: { individualId: userId },
+          },
+          AdoptionApplication: {
+            where: { individualId: userId },
+          },
+        },
+      },
+    }
+    : baseSelect;
+
   try {
     const animal = await prisma.animal.findUnique({
       where: { id: Number(id) },
-      select: {
-        id: true,
-        name: true,
-        gender: true,
-        description: true,
-        applicationStatus: true,
-        publicStatus: true,
-        animalType: {
-          select: {
-            id: true,
-            type: true
-          }
-        },
-        Image: {
-          select: {
-            parentId: true,
-            imageUrl: true,
-            fileName: true,
-            path: true,
-            contentType: true,
-            publicFlag: true,
-          }
-        },
-        _count: {
-          select: {
-            IndividualAnimal: true,
-            AdoptionApplication: true,
-          }
-        },
-      },
+      select: selectObject
     });
 
     if (!animal) {
@@ -70,6 +84,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(animal);
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "データ取得に失敗しました。" }, { status: 500 });
   }
 }
