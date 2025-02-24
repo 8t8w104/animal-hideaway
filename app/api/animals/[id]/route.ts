@@ -92,9 +92,20 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const id = req.nextUrl.pathname.split('/').pop();
   const body = await req.json();
+  const userId = body.userId;
 
   if (!id) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
+  }
+  if (!userId) {
+    return NextResponse.json({ error: "userIdが指定されていません。" }, { status: 400 });
+  }
+
+  const organizationAnimal = await prisma.organizationAnimal.findFirst({
+    where: { animalId: Number(id), organizationId: userId }
+  });
+  if (!organizationAnimal) {
+    return NextResponse.json({ error: "この動物は団体に登録されていません。" }, { status: 400 });
   }
 
   try {

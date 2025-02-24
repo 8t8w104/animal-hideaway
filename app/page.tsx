@@ -1,7 +1,8 @@
 import { NEXT_PUBLIC_API_BASE_URL } from "@/utils/constants";
-import { Animals } from "./animals/components/Animals";
-import { redirect } from 'next/navigation'
 
+import { redirect } from 'next/navigation'
+// import { Animals } from "./(main)/animals/components/Animals";
+import { Animals } from "@/app/(main)/animals/components/Animals";
 export default async function Home() {
 
   const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/animals`, {
