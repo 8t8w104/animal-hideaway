@@ -80,11 +80,7 @@ export const FileUploader = forwardRef<{
             <img src={objectURL} alt="Selected File" style={{ maxWidth: "100%", maxHeight: "200px" }} />
           </Center>
         )}
-        {/* <Center mt="md">
-          <Button onClick={handleUpload} loading={loading} color="teal" fullWidth>
-            アップロード
-          </Button>
-        </Center> */}
+
         {uploadStatus && (
           <Text mt="md" c={uploadStatus.includes("成功") ? "blue" : "red"}>
             {uploadStatus}
