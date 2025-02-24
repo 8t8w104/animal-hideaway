@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { SUPABASE_BUCKETS } from "@/app/constants/env";
+import { SUPABASE_BUCKETS } from "@/utils/env";
 import { SIGNED_URL_EXPIRATION } from "@/utils/constants";
 
 /**

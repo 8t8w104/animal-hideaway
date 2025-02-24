@@ -7,19 +7,14 @@ const prisma = new PrismaClient({
 
 export async function POST(req: NextRequest) {
   console.log("api/animals/id/apply/route.ts")
-  // const id = req.nextUrl.pathname.split('/').pop();
 
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が `id`
   const id = paths[idIndex];
 
-  console.log(id)
-  console.log("↑id")
   let body;
   try {
     body = await req.json();
-    console.log(body)
-    console.log("↑body")
   } catch (error) {
     console.error("JSON parsing error:", error);
     return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });
@@ -29,8 +24,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
   }
 
-
-  console.log("before update")
   try {
     await prisma.animal.update({
       where: {
@@ -40,8 +33,6 @@ export async function POST(req: NextRequest) {
         applicationStatus: ApplicationStatus.審査中,
       },
     });
-
-    console.log("before IndividualAnimal.create")
 
     // 既に登録されているかを確認
     const countIndividualAnimal = await prisma.individualAnimal.count({
@@ -60,8 +51,6 @@ export async function POST(req: NextRequest) {
         }
       })
     }
-
-    console.log("before adoptionApplication.create")
 
     // 既に登録されているかを確認
     const countAdoptionApplication = await prisma.adoptionApplication.count({
@@ -89,19 +78,13 @@ export async function POST(req: NextRequest) {
       createApplication = await prisma.adoptionApplication.create({ data: adoptionApplication })
     }
 
-    console.log("after adoptionApplication.create")
-
-    console.log(createApplication)
-    console.log("↑createApplication")
-
     return NextResponse.json({
       message: "応募完了しました。",
       isApplicationProcessed: createApplication ? true : false,
       isFavoriteProcessed: createIndividualAnimal ? true : false,
     });
   } catch (error) {
-    console.log("↓error")
-    console.log(JSON.stringify(error)); // this will not cause any issue
+    console.log(JSON.stringify(error));
     return NextResponse.json({ error: "更新に失敗しました。" }, { status: 500 });
   }
 }
@@ -174,18 +157,14 @@ export async function DELETE(req: NextRequest) {
           }
         },
       });
-
-      console.log("deleteIndividualAnimal:", deleteIndividualAnimal);
     }
 
-    // 3. 必要であれば、Animal の applicationStatus を「募集中」に戻す
+    // 3. Animal の applicationStatus を「募集中」に戻す
     await prisma.animal.update({
       where: { id: Number(id) },
       data: { applicationStatus: ApplicationStatus.募集中 },
     });
-    console.log("Animal status updated to 募集中");
-    console.log(deleteApplication)
-    console.log("↑deleteApplication")
+
     return NextResponse.json({
       message: "応募解除しました。",
       isApplicationProcessed: deleteApplication ? true : false,

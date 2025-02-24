@@ -7,19 +7,14 @@ const prisma = new PrismaClient({
 
 export async function POST(req: NextRequest) {
   console.log("api/animals/id/decided/route.ts")
-  // const id = req.nextUrl.pathname.split('/').pop();
 
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が `id`
   const id = paths[idIndex];
 
-  console.log(id)
-  console.log("↑id")
   let body;
   try {
     body = await req.json();
-    console.log(body)
-    console.log("↑body")
   } catch (error) {
     console.error("JSON parsing error:", error);
     return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });
@@ -29,8 +24,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
   }
 
-
-  console.log("before update")
   try {
     // 審査中であれば決定とし、決定であれば審査中に戻す
     const applicationStatus = body.decided ? ApplicationStatus.審査中 : ApplicationStatus.決定
