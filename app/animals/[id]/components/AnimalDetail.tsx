@@ -269,7 +269,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         {role === Role.Staff && (
           <>
             <Center>
-              <Text size="sm" color="dimmed" mt="xl">動物情報の編集や削除はこちら</Text>
+              <Text size="sm" c="dimmed" mt="xl">動物情報の編集や削除はこちら</Text>
             </Center>
             <Center>
               <Group>
@@ -288,7 +288,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
             </Center>
 
             <Center>
-              <Text size="sm" color="dimmed" mt="xl">応募者の決定はこちら</Text>
+              <Text size="sm" c="dimmed" mt="xl">応募者の決定はこちら</Text>
             </Center>
             <Center>
               <Group style={{ marginTop: '20px' }}>
