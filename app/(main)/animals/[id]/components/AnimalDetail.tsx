@@ -30,8 +30,8 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   });
 
   const [status, setStatus] = useState({
-    favorite: animal._count.IndividualAnimal > 0,
-    application: animal._count.AdoptionApplication > 0,
+    favorite: animal._count?.IndividualAnimal > 0,
+    application: animal._count?.AdoptionApplication > 0,
     decided: animal.applicationStatus === ApplicationStatus.決定,
   });
 
