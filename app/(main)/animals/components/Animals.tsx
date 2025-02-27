@@ -1,11 +1,12 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import { Accordion, AspectRatio, Button, Card, Container, Flex, Grid, Image, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Accordion, Box, Button, Card, Container, Grid, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
-import { ApplicationStatus, Gender, PublicStatus } from '@prisma/client';
+import { PublicStatus } from '@prisma/client';
 import { redirect, useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/useUserStore';
 import { animalTypeOptions, applicationStatusOptions, genderOptions, publicStatusOptions } from '@/utils/options';
+import Image from 'next/image';
 
 export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] }) => {
   const router = useRouter();
@@ -73,7 +74,7 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
                   label="申請状況"
                   value={formData.applicationStatus}
                   onChange={value => setFormData({ ...formData, applicationStatus: value || '' })}
-                  data={animalTypeOptions.map((opt) => ({
+                  data={applicationStatusOptions.map((opt) => ({
                     value: String(opt.value),
                     label: opt.label,
                   }))}
@@ -94,13 +95,42 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
       {/* 検索結果 */}
       <Grid mt="xl">
         {animals.map(animal => (
-          <Grid.Col key={animal.id} span={{ base: 12, sm: 6, lg: 4 }}>
-            <Card style={{ cursor: 'pointer' }} onClick={() => router.push(`/animals/${animal.id}`)}>
-              <AspectRatio ratio={16 / 9}>
-                <Image src={animal.Image[0]?.imageUrl || "/assets/noImage.jpg"} alt="Animal Image" radius="md" />
-              </AspectRatio>
-              <Text fw={"500"}>{animal.name}</Text>
-              <Text size="xs" c="dimmed">{animal.gender} | {animal.applicationStatus} | {animal.publicStatus}</Text>
+          <Grid.Col
+            key={animal.id}
+            span={{ base: 12, sm: 6, lg: 5 }}
+            bg="#f8f9fa"
+            p="md"
+            m="md"
+            style={{ borderRadius: '8px' }}
+          >
+            <Card
+              bg="white"
+              shadow="sm"
+              radius={8}
+              style={{ cursor: 'pointer' }}
+              onClick={() => router.push(`/animals/${animal.id}`)}
+            >
+              <Box
+                w={"100%"}
+                h={300}
+                bd="2px dashed #f8f9fa"
+                pos={"relative"}
+                style={{ borderRadius: "10px" }}
+              >
+                <Image
+                  src={animal.Image[0]?.imageUrl || '/assets/noImage.jpg'}
+                  alt="Animal Image"
+                  sizes="(max-width: 600px) 100vw, 300px"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                />
+              </Box>
+              <Text fw={"600"} size="lg" c="dark" mt="sm">
+                {animal.name}
+              </Text>
+              <Text size="xs" c="dimmed">
+                {animal.gender} | {animal.applicationStatus} | {animal.publicStatus}
+              </Text>
             </Card>
           </Grid.Col>
         ))}

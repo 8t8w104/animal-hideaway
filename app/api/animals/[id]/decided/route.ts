@@ -11,17 +11,29 @@ export async function POST(req: NextRequest) {
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が `id`
   const id = paths[idIndex];
-
-  let body;
-  try {
-    body = await req.json();
-  } catch (error) {
-    console.error("JSON parsing error:", error);
-    return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });
-  }
+  const body = await req.json();
+  const userId = body.userId;
 
   if (!id) {
     return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
+  }
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "userIdが指定されていません。" },
+      { status: 400 }
+    );
+  }
+
+  // 指定の動物が指定の団体に登録されているか確認
+  const organizationAnimal = await prisma.organizationAnimal.findFirst({
+    where: { animalId: Number(id), organizationId: userId },
+  });
+  if (!organizationAnimal) {
+    return NextResponse.json(
+      { error: "この動物は団体に登録されていません。" },
+      { status: 400 }
+    );
   }
 
   try {

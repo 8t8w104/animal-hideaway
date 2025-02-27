@@ -1,8 +1,10 @@
 'use client'
 import { SignedUrlType } from "@/utils/constants";
 import { generateFilePath } from "@/utils/path-utils";
-import { Button, Card, Center, Text } from "@mantine/core";
+import { Button, Card, Center, Text, Loader } from "@mantine/core";
 import { forwardRef, useState, useImperativeHandle } from "react";
+import imageCompression from 'browser-image-compression';
+import Image from 'next/image';
 
 export const FileUploader = forwardRef<{
   handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }>,
@@ -12,11 +14,18 @@ export const FileUploader = forwardRef<{
     const [file, setFile] = useState<File | null>(null);
     const [uploadStatus, setUploadStatus] = useState<string>("");
     const [objectURL, setObjectURL] = useState<string>("");
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
         const fileObject = e.target.files[0];
-        setFile(fileObject);
-        setObjectURL(window.URL.createObjectURL(fileObject));
+        const compressedFile = await imageCompression(fileObject, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800,
+          useWebWorker: true
+        });
+        setFile(compressedFile);
+        setObjectURL(window.URL.createObjectURL(compressedFile));
       }
     };
 
@@ -26,6 +35,7 @@ export const FileUploader = forwardRef<{
       }
 
       try {
+        setLoading(true);
         const filePath = generateFilePath({ userId });
         const res = await fetch("/api/signed-url", {
           method: "POST",
@@ -49,6 +59,7 @@ export const FileUploader = forwardRef<{
         setUploadStatus("アップロード中にエラーが発生しました。");
         return null;
       } finally {
+        setLoading(false);
         setUploadStatus("ファイルアップロードに成功しました。");
       }
     };
@@ -67,18 +78,31 @@ export const FileUploader = forwardRef<{
 
     return (
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Text mt="md" size="lg" style={{ weight: "500" }}>画像アップロード</Text>
-
+        <Text mt="md" size="lg" fw={500}>画像アップロード</Text>
         <input type="file" onChange={handleFileChange} accept="image/*" style={{ display: "none" }} id="file-upload" />
         <label htmlFor="file-upload">
-          <Button component="span" size="md" variant="outline" c="blue" fullWidth>
+          <Button component="span" size="md" variant="outline" color="blue" fullWidth>
             ファイルを選択
           </Button>
         </label>
-        {objectURL && (
-          <Center mt="md" style={{ border: '1px solid black' }}>
-            <img src={objectURL} alt="Selected File" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+
+        {loading ? (
+          <Center mt="md">
+            <Loader />
           </Center>
+        ) : (
+          objectURL && (
+            <Center mt="md">
+              <Image
+                src={objectURL}
+                alt="Selected File"
+                width={300}
+                height={200}
+                style={{ objectFit: 'contain' }}
+                sizes="(max-width: 600px) 100vw, 300px"
+              />
+            </Center>
+          )
         )}
 
         {uploadStatus && (
