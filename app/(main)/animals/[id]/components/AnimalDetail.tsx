@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center, ActionIcon, Tooltip, Loader } from '@mantine/core';
+import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center, ActionIcon, Tooltip, Loader, Box } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle, IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -46,7 +46,10 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       const res = await fetch(`/api/animals/${animal.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          userId
+        }),
       });
       if (res.ok) {
         router.refresh();
@@ -64,7 +67,11 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const handleDelete = async () => {
     setLoadingStates(prev => ({ ...prev, delete: true }));
     try {
-      const res = await fetch(`/api/animals/${animal.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/animals/${animal.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
       if (res.ok) {
         router.push('/');
       }
@@ -164,24 +171,29 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
   return (
     <Container size="sm" py="xl">
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card shadow="sm" padding="lg" radius="md" withBorder bg="#f8f9fa">
         <Grid>
-          <Grid.Col span={12}>
-            <div style={{ position: "relative", width: "100%", maxWidth: "500px", height: "auto" }}>
+          <Grid.Col span={12} bg="white" style={{ borderRadius: "12px" }}>
+            <Box
+              w={"100%"}
+              h={400}
+              bd="2px dashed #f8f9fa"
+              pos={"relative"}
+              style={{ borderRadius: "12px" }}
+            >
               <Image
-                src={animal.Image[0]?.imageUrl || "/assets/noImage.jpg"}
-                alt={animal.name || "Default image"}
-                layout="responsive"
-                width={500}
-                height={300}
-                objectFit="cover"
+                src={animal.Image[0]?.imageUrl || '/assets/noImage.jpg'}
+                alt={animal.name}
+                sizes="(max-width: 600px) 100vw, 500px"
+                fill
+                style={{ objectFit: 'contain' }}
                 priority
               />
-            </div>
+            </Box>
           </Grid.Col>
           <Grid.Col span={12}>
-            <Stack mt="md">
-              <Text size="sm" c="dimmed">ID: {animal.id}</Text>
+            <Stack mt="md" gap="md">
+              <Text c="dimmed">ID: {animal.id}</Text>
               {isEditing ? (
                 <>
                   <TextInput label="名前" value={formData.name} onChange={(e) => handleChange('name', e.target.value)} />
@@ -196,7 +208,13 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
                       { value: '不明', label: '不明' },
                     ]}
                   />
-                  <Textarea label="説明" value={formData.description} onChange={(e) => handleChange('description', e.target.value)} />
+                  <Textarea
+                    label="説明"
+                    value={formData.description}
+                    onChange={(e) => handleChange('description', e.target.value)}
+                    autosize
+                    minRows={3}
+                  />
                   <Select
                     label="応募ステータス"
                     value={formData.applicationStatus}
@@ -223,9 +241,18 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
               ) : (
                 <>
                   <Title order={2}>{animal.name}</Title>
-                  <Paper shadow="xs" p="md" radius="md" mt="sm">
-                    <Text>{animal.description || <span>説明なし <IconInfoCircle size={14} stroke={1.5} /></span>}</Text>
-                  </Paper>
+                  <Stack gap={0}>
+                    <Text size="lg" fw={600}>説明</Text>
+                    {animal.description ? (
+                      <Text bg={"white"} style={{ whiteSpace: 'pre-wrap', borderRadius: "12px" }}>
+                        {animal.description}
+                      </Text>
+                    ) : (
+                      <Text>
+                        説明なし <IconInfoCircle size={14} stroke={1.5} />
+                      </Text>
+                    )}
+                  </Stack>
                   <Text>性別: {animal.gender || '未設定'}</Text>
                   <Text>応募ステータス: {animal.applicationStatus || '未設定'}</Text>
                   <Text>公開ステータス: {animal.publicStatus || '未設定'}</Text>
@@ -291,7 +318,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
               <Text size="sm" c="dimmed" mt="xl">応募者の決定はこちら</Text>
             </Center>
             <Center>
-              <Group style={{ marginTop: '20px' }}>
+              <Group>
                 <Button
                   color={status.decided ? 'orange' : 'green'}
                   size="lg"

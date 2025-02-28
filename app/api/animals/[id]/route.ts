@@ -127,14 +127,65 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const id = req.nextUrl.pathname.split('/').pop();
+  const id = req.nextUrl.pathname.split("/").pop();
+  const body = await req.json();
+  const userId = body.userId;
 
   if (!id) {
-    return NextResponse.json({ error: "IDが指定されていません。" }, { status: 400 });
+    return NextResponse.json(
+      { error: "IDが指定されていません。" },
+      { status: 400 }
+    );
+  }
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "userIdが指定されていません。" },
+      { status: 400 }
+    );
+  }
+
+  // 指定の動物が指定の団体に登録されているか確認
+  const organizationAnimal = await prisma.organizationAnimal.findFirst({
+    where: { animalId: Number(id), organizationId: userId },
+  });
+  if (!organizationAnimal) {
+    return NextResponse.json(
+      { error: "この動物は団体に登録されていません。" },
+      { status: 400 }
+    );
   }
 
   try {
-    await prisma.animal.delete({ where: { id: Number(id) } });
+    // トランザクション内で関連レコードを削除
+    await prisma.$transaction(async (tx) => {
+      // 画像（image）の削除
+      await tx.image.deleteMany({
+        where: {
+          parentId: Number(id),
+        },
+      });
+      console.log("画像削除完了");
+
+      // 団体に属する動物（organization_animal）の削除
+      await tx.organizationAnimal.delete({
+        where: {
+          animalId_organizationId: {
+            animalId: Number(id),
+            organizationId: userId,
+          }
+        },
+      });
+
+      console.log("organizationAnimal削除完了");
+
+      // 動物（animal）の削除
+      await tx.animal.delete({
+        where: { id: Number(id) },
+      });
+      console.log("animal削除完了");
+    });
+
     return NextResponse.json({ message: "動物が削除されました。" });
   } catch (error) {
     console.log(JSON.stringify(error))
