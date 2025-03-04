@@ -1,0 +1,25 @@
+@startuml
+actor ユーザー as user
+participant ブラウザ as browser
+participant Next.js as api
+participant "Supabase Storage" as storage
+participant PostgreSQL as db
+
+==  動物を登録する（ファイルアップロードも含む） ==
+user -> browser: 動物情報を入力、画像を選択
+user -> browser: 登録ボタンを押下
+browser -> browser: 画像格納パス生成
+browser -> api: 署名付きURLをリクエスト (POST)
+api -> storage: 署名付きURLを生成リクエスト
+storage -> api: 署名付きURLを返す
+api -> browser: 署名付きURLを返す
+browser -> storage: バイナリを署名付きURLにアップロード
+note right of storage: バイナリはサーバ(Next.js)を経由させない
+storage -> browser: アップロード完了
+browser -> api: 動物情報と画像格納パスをDBに登録リクエスト (POST)
+api -> db: 動物情報と画像格納パスをDBに登録
+db -> api: 登録結果を返す
+api -> browser: 登録完了結果を返す
+browser -> user: 登録完了トーストを表示
+
+@enduml

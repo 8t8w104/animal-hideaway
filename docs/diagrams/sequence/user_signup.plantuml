@@ -1,0 +1,25 @@
+@startuml
+actor ユーザー as user
+participant ブラウザ as browser
+participant Next.js as api
+participant "Supabase Auth" as auth
+participant PostgreSQL as db
+
+== アカウントを新規作成する ==
+user -> browser: アカウント新規作成画面表示
+browser -> user: ユーザー名、メール、パスワード入力フォームを表示
+user -> browser: ユーザー名、メール、パスワードを入力
+browser -> api: ユーザー名、メール、パスワードを送信 (POST)
+api -> auth: supabase.auth.signUpを呼び出し (メール、パスワード)
+auth -> api: ユーザー登録結果を返す
+alt 登録成功
+    api -> db: ユーザー情報をDBに登録
+    db -> api: ユーザー情報を登録完了
+    api -> browser: 登録完了メッセージを返す
+    browser -> user: 登録完了メッセージを表示
+else 登録失敗
+    api -> browser: エラーメッセージを返す
+    browser -> user: エラーメッセージを表示
+end
+
+@enduml

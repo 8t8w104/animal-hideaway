@@ -1,0 +1,25 @@
+@startuml
+actor ユーザー as user
+participant ブラウザ as browser
+participant Next.js as api
+participant "Supabase Auth" as auth
+participant PostgreSQL as db
+
+== ログインする ==
+user -> browser: ログイン画面表示
+browser -> user: メール、パスワード入力フォームを表示
+user -> browser: メール、パスワードを入力
+browser -> api: メール、パスワードを送信 (POST)
+api -> auth: supabase.auth.signInWithPasswordを呼び出し (メール、パスワード)
+auth -> api: ログイン結果を返す
+alt ログイン成功
+    api -> db: ユーザー情報をDBから取得
+    db -> api: ユーザー情報を返す
+    api -> browser: ユーザー情報と認証トークンを返す
+    browser -> user: ユーザー情報を表示、ログイン成功メッセージを表示
+else ログイン失敗
+    api -> browser: エラーメッセージを返す
+    browser -> user: エラーメッセージを表示
+end
+
+@enduml
