@@ -1,0 +1,16 @@
+@startuml
+actor ユーザー as user
+participant ブラウザ as browser
+participant Next.js as api
+participant PostgreSQL as db
+
+== 動物のステータス更新（里親希望/解除、里親決定/解除）する ==
+user -> browser: 動物詳細画面を表示
+user -> browser: ステータス更新ボタンを押下
+browser -> api: ステータス更新APIにアクセス (POST)
+api -> db: ステータスをDBに登録
+db -> api: 登録結果を返す
+api -> browser: 登録結果を返す
+browser -> user: 処理完了トーストを表示
+
+@enduml

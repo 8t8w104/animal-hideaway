@@ -1,0 +1,29 @@
+@startuml
+actor ユーザー as user
+participant ブラウザ as browser
+participant Next.js as api
+participant "Supabase Storage" as storage
+participant PostgreSQL as db
+
+== 動物を検索する ==
+user -> browser: 検索画面を表示
+browser -> api: 動物情報、画像格納パスを取得する (GET)
+api -> db: 動物情報、画像格納パスをDBから取得
+db -> api: 動物情報、画像格納パスを返す
+alt 画像格納パスがある場合
+    api -> storage: 署名付きURLをリクエスト (POST)
+    storage -> api: 署名付きURLを返す
+    api -> api: 署名付きURLを動物情報に追加する
+else 画像格納パスがない場合
+    note right of api: 処理なし
+end
+api -> browser: 動物情報（画像格納パス）を返す
+
+alt 画像格納パスがある場合
+    browser -> storage: 画像を取得する (GET)
+    storage -> browser: 画像を返す
+else 画像格納パスがない場合
+    note right of browser: 処理なし
+end
+
+@enduml
