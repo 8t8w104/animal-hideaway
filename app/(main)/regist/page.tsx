@@ -12,6 +12,6 @@ export default async function Page() {
   }
 
   return (
-    <><Regist userId={data?.user.id} /></>
+    <Regist userId={data?.user.id} />
   );
 }
