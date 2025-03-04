@@ -6,8 +6,6 @@ const prisma = new PrismaClient({
 });
 
 export async function POST(req: NextRequest) {
-  console.log("api/animals/id/apply/route.ts")
-
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が `id`
   const id = paths[idIndex];
@@ -91,8 +89,6 @@ export async function POST(req: NextRequest) {
 
 
 export async function DELETE(req: NextRequest) {
-  console.log("api/animals/id/apply/route.ts DELETE");
-
   // URL から animal の id を取得
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が id
@@ -105,7 +101,6 @@ export async function DELETE(req: NextRequest) {
   let body;
   try {
     body = await req.json();
-    console.log("リクエストボディ:", body);
   } catch (error) {
     console.error("JSON parsing error:", error);
     return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });

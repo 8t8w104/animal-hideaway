@@ -70,9 +70,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log(animals);
-    console.log(`↑api/animals/api 取得結果`);
-
     return NextResponse.json(animals || []);
   } catch (error) {
     console.log(JSON.stringify(error))

@@ -1,6 +1,23 @@
 'use client';
 import Image from 'next/image';
-import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center, ActionIcon, Tooltip, Loader, Box } from '@mantine/core';
+import {
+  Card,
+  Text,
+  Container,
+  Stack,
+  Title,
+  Button,
+  TextInput,
+  Grid,
+  Select,
+  Group,
+  Textarea,
+  ActionIcon,
+  Center,
+  Tooltip,
+  Loader,
+  Box
+} from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle, IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -43,7 +60,6 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   };
 
   // オーナーか（パラメタのanimalを登録した職員と、ログイン中職員が同じか）
-  console.log(animal.OrganizationAnimal)
   const isAnimalOwner = animal.OrganizationAnimal?.[0]?.organizationId === userId
 
   // 動物編集（職員）
@@ -206,7 +222,6 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data)
 
         if (data.isApplicationProcessed) {
           setStatus(prev => ({ ...prev, application: !prev.application }));

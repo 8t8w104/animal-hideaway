@@ -1,12 +1,9 @@
 'use client';
 
 import { GitHubButton } from '@/app/components/GitHubButton';
-import { GoogleButton } from '@/app/components/GoogleButton';
 import {
   Button,
-  Checkbox,
   Divider,
-  Group,
   Paper,
   Stack,
   Text,
@@ -18,7 +15,6 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useState } from 'react';
-import Link from 'next/link';
 import { login } from './actions';
 import { createSupabaseClient } from "@/utils/supabase/client";
 import { useRouter } from 'next/navigation';
@@ -50,7 +46,6 @@ export default function LoginPage() {
   const handleLogin = async (provider: 'google' | 'github') => {
     const supabase = await createSupabaseClient();
     const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_GITHUB_REDIRECT_URL!
-    console.log(`redirectTo=${redirectTo}`);
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -91,7 +86,6 @@ export default function LoginPage() {
 
             <Stack m="md">
               <GitHubButton radius="xl" onClick={() => handleLogin('github')}>GitHub</GitHubButton>
-              {/* <GoogleButton></GoogleButton> */}
             </Stack>
 
             <Divider label="または" labelPosition="center" my="lg" />

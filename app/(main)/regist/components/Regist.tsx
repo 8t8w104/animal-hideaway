@@ -120,20 +120,6 @@ export const Regist = ({ userId }: { userId: string }) => {
 
       <Divider my="xl" />
 
-      {/* 登録成功後のモーダル */}
-      {/* <Modal
-        opened={isModalOpen}
-        onClose={() => {
-          fileUploadRef.current?.clear();
-          form.reset();
-          setModalOpen(false)
-          router.push("/")
-        }}
-        title="登録完了"
-        centered
-      >
-        <p>動物が正常に登録されました！</p>
-      </Modal> */}
     </Container>
   );
 };

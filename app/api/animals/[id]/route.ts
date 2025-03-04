@@ -84,9 +84,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log(animal)
-    console.log("↑api/animals/[id] 検索結果")
-
     return NextResponse.json(animal);
   } catch (error) {
     console.error(error);
@@ -194,7 +191,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: "動物が削除されました。" });
   } catch (error) {
     console.log(JSON.stringify(error))
-    console.log("↑JSON.stringify(error)")
     return NextResponse.json({ error: "削除に失敗しました。" }, { status: 500 });
   }
 }
