@@ -8,13 +8,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Box
-      style={{
-        backgroundColor: theme.colors.gray[0],
-        padding: theme.spacing.md,
-        width: '100%',
-      }}
-    >
+    <Box bg="var(--bg-color)" p="md" w="100%">
       <Center>
         <Group gap="xl">
           <Text style={{ color: "dimmed" }} size="sm">

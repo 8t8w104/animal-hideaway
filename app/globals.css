@@ -1,4 +1,7 @@
-/* globals.css */
+:root {
+  --bg-color: #dff0ea;
+}
+
 body {
   display: flex;
   flex-direction: column;

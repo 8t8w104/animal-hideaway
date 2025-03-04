@@ -171,7 +171,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
   return (
     <Container size="sm" py="xl">
-      <Card shadow="sm" padding="lg" radius="md" withBorder bg="#f8f9fa">
+      <Card shadow="sm" padding="lg" radius="md" withBorder bg="var(--bg-color)">
         <Grid>
           <Grid.Col span={12} bg="white" style={{ borderRadius: "12px" }}>
             <Box

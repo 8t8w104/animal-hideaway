@@ -42,7 +42,7 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
 
   return (
     <Container py="xl">
-      <Accordion variant="separated" maw={500} mx="auto">
+      <Accordion bg="var(--bg-color)" maw={500} mx="auto">
         <Accordion.Item value="search">
           <Accordion.Control>
             <Title order={5}>検索条件</Title>
@@ -93,12 +93,12 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
       </Accordion>
 
       {/* 検索結果 */}
-      <Grid mt="xl">
+      <Grid mt="xl" justify="center">
         {animals.map(animal => (
           <Grid.Col
             key={animal.id}
-            span={{ base: 12, sm: 6, lg: 5 }}
-            bg="#f8f9fa"
+            span={{ base: 11, sm: 6, lg: 5 }}
+            bg="var(--bg-color)"
             p="md"
             m="md"
             style={{ borderRadius: '8px' }}
