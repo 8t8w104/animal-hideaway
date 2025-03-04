@@ -4,6 +4,8 @@ import { Footer } from "@/app/components/Footer";
 import '@mantine/core/styles.css';
 import "./globals.css";
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from '@mantine/notifications';
+import '@mantine/notifications/styles.css';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -29,6 +31,7 @@ export default function RootLayout({
     <html lang="ja" className={geistSans.className}>
       <body>
         <MantineProvider>
+          <Notifications />
           <Header />
           <main>
             <div>

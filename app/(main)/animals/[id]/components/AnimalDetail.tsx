@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/useUserStore";
 import { Role } from '@/utils/constants';
 import { ApplicationStatus } from '@prisma/client';
+import { notifications } from '@mantine/notifications';
 
 export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const router = useRouter();
@@ -54,9 +55,22 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       if (res.ok) {
         router.refresh();
         setIsEditing(false);
+
+        notifications.show({
+          title: '成功',
+          message: '更新に成功しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '更新に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, update: false }));
     }
@@ -74,14 +88,26 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       });
       if (res.ok) {
         router.push('/');
+
+        notifications.show({
+          title: '成功',
+          message: '削除に成功しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '削除に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, delete: false }));
     }
   };
-
 
   // 職員操作：ステータス更新（審査中→決定）
   const handleDecided = async () => {
@@ -101,9 +127,23 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         setStatus(prev => ({ ...prev, decided: !prev.decided }));
         router.refresh();
         setIsEditing(false);
+
+
+        notifications.show({
+          title: '成功',
+          message: `${status.decided ? '決定を取り消しました。' : '決定しました。'}`,
+          color: 'green',
+          position: 'top-center'
+        });
       }
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '更新に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, decide: false }));
     }
@@ -127,10 +167,23 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }
 
         router.refresh();
+
+        notifications.show({
+          title: '成功',
+          message: 'お気に入り登録に成功しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
 
     } catch (error) {
       console.error('お気に入り操作エラー', error);
+      notifications.show({
+        title: '失敗',
+        message: 'お気に入り登録に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, favorite: false }));
     }
@@ -160,9 +213,22 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }
         router.refresh();
         setIsEditing(false);
+
+        notifications.show({
+          title: '成功',
+          message: '応募しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '応募に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, apply: false }))
     }
