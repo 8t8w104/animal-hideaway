@@ -49,21 +49,20 @@ https://miro.com/app/board/uXjVIWoiAVY=/
 
 
 ## デモ
-[URL]
-https://animal-hideaway.vercel.app/
+URL：https://animal-hideaway.vercel.app/
 
-### 一般ユーザー１
-ID:general1@test
-PASS:general1
+### 一般ユーザー１  
+ID：general1@test  
+PASS：general1  
 
 ### 一般ユーザー２
-ID:general2@test
-PASS:general2
+ID：general2@test  
+PASS：general2  
 
 ### 職員ユーザー１
-ID:staff1@test
-PASS:staff1
+ID：staff1@test  
+PASS：staff1  
 
 ### 職員ユーザー２
-ID:staff2@test
-PASS:staff2
+ID：staff2@test  
+PASS：staff2  
