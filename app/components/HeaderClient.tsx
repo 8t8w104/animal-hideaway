@@ -47,7 +47,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
     try {
       await signOutAction();
     } catch (error) {
-      console.error("サインアウトに失敗しました failed", error);
+      console.error("ログアウトに失敗しました failed", error);
     } finally {
       setLoading(false);
       close()
@@ -56,8 +56,8 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
 
   return (
     <Box
+      bg="var(--bg-color)"
       style={{
-        backgroundColor: '#f8f9fa',
         height: 60,
         padding: 16,
         display: 'flex',
@@ -100,7 +100,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
                 <Text>{user.email}</Text>
               </Group>
               <Button onClick={handleSignOutClick} color="red" fullWidth loading={loading}>
-                サインアウト
+                ログアウト
               </Button>
             </>
           ) : (
@@ -137,7 +137,7 @@ export const HeaderClient = ({ user }: { user: User | null }) => {
               <Text>{user.email}</Text>
             </Group>
             <Button onClick={handleSignOutClick} color="red" loading={loading}>
-              サインアウト
+              ログアウト
             </Button>
           </>
         ) : (

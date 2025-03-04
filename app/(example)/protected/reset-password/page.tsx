@@ -1,4 +1,3 @@
-import { resetPasswordAction } from "@/app/actions";
 import { FormMessage, Message } from "@/app/(example)/form-message";
 
 export default async function ResetPassword(props: {

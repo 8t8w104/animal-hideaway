@@ -1,6 +1,23 @@
 'use client';
 import Image from 'next/image';
-import { Card, Text, Container, Stack, Title, Paper, Button, TextInput, Grid, Select, ScrollArea, Group, Divider, Textarea, Center, ActionIcon, Tooltip, Loader, Box } from '@mantine/core';
+import {
+  Card,
+  Text,
+  Container,
+  Stack,
+  Title,
+  Button,
+  TextInput,
+  Grid,
+  Select,
+  Group,
+  Textarea,
+  ActionIcon,
+  Center,
+  Tooltip,
+  Loader,
+  Box
+} from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle, IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -8,6 +25,7 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/useUserStore";
 import { Role } from '@/utils/constants';
 import { ApplicationStatus } from '@prisma/client';
+import { notifications } from '@mantine/notifications';
 
 export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const router = useRouter();
@@ -18,6 +36,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     applicationStatus: animal.applicationStatus || '',
     publicStatus: animal.publicStatus || '',
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const { role, userId } = useUserStore()
 
@@ -35,9 +54,13 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     decided: animal.applicationStatus === ApplicationStatus.決定,
   });
 
+  // 各ステータスを更新する
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
+
+  // オーナーか（パラメタのanimalを登録した職員と、ログイン中職員が同じか）
+  const isAnimalOwner = animal.OrganizationAnimal?.[0]?.organizationId === userId
 
   // 動物編集（職員）
   const handleUpdate = async () => {
@@ -51,12 +74,24 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           userId
         }),
       });
-      if (res.ok) {
-        router.refresh();
-        setIsEditing(false);
-      }
+      if (!res.ok) throw new Error("更新に失敗しました。");
+      router.refresh();
+      setIsEditing(false);
+
+      notifications.show({
+        title: '成功',
+        message: '更新に成功しました。',
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '更新に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, update: false }));
     }
@@ -72,16 +107,27 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
       });
-      if (res.ok) {
-        router.push('/');
-      }
+      if (!res.ok) throw new Error("削除に失敗しました。");
+      router.push('/');
+
+      notifications.show({
+        title: '成功',
+        message: '削除に成功しました。',
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '削除に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, delete: false }));
     }
   };
-
 
   // 職員操作：ステータス更新（審査中→決定）
   const handleDecided = async () => {
@@ -97,13 +143,26 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }),
       });
 
-      if (res.ok) {
-        setStatus(prev => ({ ...prev, decided: !prev.decided }));
-        router.refresh();
-        setIsEditing(false);
-      }
+      if (!res.ok) throw new Error("更新に失敗しました。");
+
+      setStatus(prev => ({ ...prev, decided: !prev.decided }));
+      router.refresh();
+      setIsEditing(false);
+
+      notifications.show({
+        title: '成功',
+        message: `${status.decided ? '決定を取り消しました。' : '決定しました。'}`,
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '更新に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, decide: false }));
     }
@@ -127,10 +186,23 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }
 
         router.refresh();
+
+        notifications.show({
+          title: '成功',
+          message: 'お気に入り登録に成功しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
 
     } catch (error) {
       console.error('お気に入り操作エラー', error);
+      notifications.show({
+        title: '失敗',
+        message: 'お気に入り登録に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, favorite: false }));
     }
@@ -150,7 +222,6 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data)
 
         if (data.isApplicationProcessed) {
           setStatus(prev => ({ ...prev, application: !prev.application }));
@@ -160,9 +231,22 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }
         router.refresh();
         setIsEditing(false);
+
+        notifications.show({
+          title: '成功',
+          message: '応募しました。',
+          color: 'green',
+          position: 'top-center'
+        });
       }
     } catch (error) {
       console.log(error)
+      notifications.show({
+        title: '失敗',
+        message: '応募に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoadingStates(prev => ({ ...prev, apply: false }))
     }
@@ -171,7 +255,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
 
   return (
     <Container size="sm" py="xl">
-      <Card shadow="sm" padding="lg" radius="md" withBorder bg="#f8f9fa">
+      <Card shadow="sm" padding="lg" radius="md" withBorder bg="var(--bg-color)">
         <Grid>
           <Grid.Col span={12} bg="white" style={{ borderRadius: "12px" }}>
             <Box
@@ -293,7 +377,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           </Center>
         }
 
-        {role === Role.Staff && (
+        {isAnimalOwner && (
           <>
             <Center>
               <Text size="sm" c="dimmed" mt="xl">動物情報の編集や削除はこちら</Text>

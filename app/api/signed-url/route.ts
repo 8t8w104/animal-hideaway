@@ -24,12 +24,6 @@ export async function POST(req: NextRequest) {
       ? await supabase.storage.from(SUPABASE_BUCKETS).createSignedUploadUrl(filePath, { upsert: true })
       : await supabase.storage.from(SUPABASE_BUCKETS).createSignedUrl(filePath, SIGNED_URL_EXPIRATION);
 
-
-  console.log(data);
-  console.log("↑data");
-  console.log(error);
-  console.log("↑error");
-
   if (error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

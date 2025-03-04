@@ -6,14 +6,16 @@ import { Container, Card, Stack, Title, Group, Divider, Button, TextInput, Selec
 import { FileUploader } from "@/app/components/FileUploader";
 import { animalTypeOptions, applicationStatusOptions, genderOptions, publicStatusOptions } from "@/utils/options";
 import { Animal, ApplicationStatus, Gender, PublicStatus } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { notifications } from '@mantine/notifications';
 
 export const Regist = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const fileUploadRef = useRef<{
     handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }>
     clear: () => void
   }>(null);
+  const router = useRouter();
 
   const form = useForm({
     initialValues: {
@@ -59,9 +61,23 @@ export const Regist = ({ userId }: { userId: string }) => {
       });
 
       if (!res.ok) throw new Error("登録に失敗しました");
-      setModalOpen(true);
+
+      notifications.show({
+        title: '成功',
+        message: '動物が正常に登録されました。',
+        color: 'green',
+        position: 'top-center'
+      });
+
+      router.push("/")
     } catch (error) {
       console.error(error);
+      notifications.show({
+        title: '失敗',
+        message: '登録に失敗しました。',
+        color: 'red',
+        position: 'top-center'
+      });
     } finally {
       setLoading(false);
     }
@@ -103,20 +119,6 @@ export const Regist = ({ userId }: { userId: string }) => {
       </Card>
 
       <Divider my="xl" />
-
-      {/* 登録成功後のモーダル */}
-      <Modal
-        opened={isModalOpen}
-        onClose={() => {
-          fileUploadRef.current?.clear();
-          form.reset();
-          setModalOpen(false)
-        }}
-        title="登録完了"
-        centered
-      >
-        <p>動物が正常に登録されました！</p>
-      </Modal>
 
     </Container>
   );

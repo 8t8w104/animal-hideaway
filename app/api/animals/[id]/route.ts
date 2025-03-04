@@ -37,6 +37,11 @@ export async function GET(req: NextRequest) {
         publicFlag: true,
       },
     },
+    OrganizationAnimal: {
+      select: {
+        organizationId: true
+      }
+    }
   };
 
   // userIdが存在する場合のみ_countをselectに追加
@@ -78,9 +83,6 @@ export async function GET(req: NextRequest) {
         })
       );
     }
-
-    console.log(animal)
-    console.log("↑api/animals/[id] 検索結果")
 
     return NextResponse.json(animal);
   } catch (error) {
@@ -189,7 +191,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: "動物が削除されました。" });
   } catch (error) {
     console.log(JSON.stringify(error))
-    console.log("↑JSON.stringify(error)")
     return NextResponse.json({ error: "削除に失敗しました。" }, { status: 500 });
   }
 }

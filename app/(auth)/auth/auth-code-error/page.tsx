@@ -1,13 +1,6 @@
 'use client'
-// import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function AuthCodeError() {
-  // const router = useRouter()
-  // const { message } = router.
-  // const searchParams = useSearchParams();
-  // console.log(searchParams)
-  // console.log("↑searchParams")
-
   return (
     <div>
       <h1>認証エラーが発生しました</h1>

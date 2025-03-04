@@ -6,8 +6,6 @@ const prisma = new PrismaClient({
 });
 
 export async function POST(req: NextRequest) {
-  console.log("api/animals/id/decided/route.ts")
-
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1; // `animals` の次が `id`
   const id = paths[idIndex];
@@ -53,7 +51,6 @@ export async function POST(req: NextRequest) {
       isAnimalProcessed: updateAnimal ? true : false,
     });
   } catch (error) {
-    console.log("↓error")
     console.log(JSON.stringify(error)); // this will not cause any issue
     return NextResponse.json({ error: "ステータス更新に失敗しました。" }, { status: 500 });
   }

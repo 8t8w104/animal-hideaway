@@ -1,12 +1,9 @@
 'use client';
 
 import { GitHubButton } from '@/app/components/GitHubButton';
-import { GoogleButton } from '@/app/components/GoogleButton';
 import {
   Button,
-  Checkbox,
   Divider,
-  Group,
   Paper,
   Stack,
   Text,
@@ -51,7 +48,6 @@ export default function SignupPage() {
   const handleLogin = async (provider: 'google' | 'github') => {
     const supabase = await createSupabaseClient();
     const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_GITHUB_REDIRECT_URL!
-    console.log(`redirectTo=${redirectTo}`);
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -83,7 +79,7 @@ export default function SignupPage() {
       <Center>
         <Paper radius="lg" m="sm" p="xl" miw={300} maw={600} style={{ width: '100%', border: '1px solid rgba(0, 0, 0, 0.1)', boxSizing: 'border-box' }}>
           <Text size="xl" style={{ weight: "600" }} mb="sm">
-            ログイン
+            新規登録
           </Text>
           <form onSubmit={form.onSubmit(signUp)}>
 
@@ -119,18 +115,17 @@ export default function SignupPage() {
 
 
             <Text size="sm" mt="md">
-              お手持ちのアカウントで会員登録する
+              お手持ちのアカウントで登録する
             </Text>
 
             <Stack m="md">
               <GitHubButton radius="xl" onClick={() => handleLogin('github')}>GitHub</GitHubButton>
-              {/* <GoogleButton></GoogleButton> */}
             </Stack>
 
             <Divider label="または" labelPosition="center" my="lg" />
 
             <Text size="sm" mt="md" mb="md">
-              メールアドレスで会員登録する
+              メールアドレスで登録する
             </Text>
 
             <Stack gap={24}>

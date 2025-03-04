@@ -1,4 +1,3 @@
-// app/api/animals/[id]/favorite/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
@@ -7,8 +6,6 @@ const prisma = new PrismaClient({
 });
 
 export async function POST(req: NextRequest) {
-  console.log("api/animals/id/favorite/route.ts POST");
-
   // URLから animal の id を取得
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1;
@@ -21,7 +18,6 @@ export async function POST(req: NextRequest) {
   let body;
   try {
     body = await req.json();
-    console.log("リクエストボディ:", body);
   } catch (error) {
     console.error("JSON parsing error:", error);
     return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });
@@ -49,8 +45,7 @@ export async function POST(req: NextRequest) {
         animalId: Number(id),
       },
     });
-    console.log("お気に入り登録:", favorite);
-    // return NextResponse.json(favorite);
+
     return NextResponse.json({
       message: "お気に入り登録しました。",
       isFavoriteProcessed: favorite ? true : false,
@@ -62,8 +57,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  console.log("api/animals/id/favorite/route.ts DELETE");
-
   // URLから animal の id を取得
   const paths = req.nextUrl.pathname.split("/");
   const idIndex = paths.indexOf("animals") + 1;
@@ -76,7 +69,6 @@ export async function DELETE(req: NextRequest) {
   let body;
   try {
     body = await req.json();
-    console.log("リクエストボディ:", body);
   } catch (error) {
     console.error("JSON parsing error:", error);
     return NextResponse.json({ error: "リクエストボディの解析に失敗しました。" }, { status: 400 });
@@ -93,7 +85,6 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (count === 0) {
-      console.log("お気に入り登録がありません。処理を終了します。");
       return NextResponse.json({ message: "お気に入り登録がありません。" });
     }
 
@@ -106,7 +97,6 @@ export async function DELETE(req: NextRequest) {
         },
       },
     });
-    console.log("お気に入り解除:", deletedFavorite);
 
     return NextResponse.json({
       message: "お気に入り解除しました。",
