@@ -37,6 +37,11 @@ export async function GET(req: NextRequest) {
         publicFlag: true,
       },
     },
+    OrganizationAnimal: {
+      select: {
+        organizationId: true
+      }
+    }
   };
 
   // userIdが存在する場合のみ_countをselectに追加

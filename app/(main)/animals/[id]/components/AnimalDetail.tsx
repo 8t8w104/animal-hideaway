@@ -19,6 +19,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     applicationStatus: animal.applicationStatus || '',
     publicStatus: animal.publicStatus || '',
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const { role, userId } = useUserStore()
 
@@ -36,9 +37,14 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     decided: animal.applicationStatus === ApplicationStatus.決定,
   });
 
+  // 各ステータスを更新する
   const handleChange = (key: string, value: string) => {
     setFormData({ ...formData, [key]: value });
   };
+
+  // オーナーか（パラメタのanimalを登録した職員と、ログイン中職員が同じか）
+  console.log(animal.OrganizationAnimal)
+  const isAnimalOwner = animal.OrganizationAnimal?.[0]?.organizationId === userId
 
   // 動物編集（職員）
   const handleUpdate = async () => {
@@ -52,17 +58,16 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           userId
         }),
       });
-      if (res.ok) {
-        router.refresh();
-        setIsEditing(false);
+      if (!res.ok) throw new Error("更新に失敗しました。");
+      router.refresh();
+      setIsEditing(false);
 
-        notifications.show({
-          title: '成功',
-          message: '更新に成功しました。',
-          color: 'green',
-          position: 'top-center'
-        });
-      }
+      notifications.show({
+        title: '成功',
+        message: '更新に成功しました。',
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
       notifications.show({
@@ -86,16 +91,15 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
       });
-      if (res.ok) {
-        router.push('/');
+      if (!res.ok) throw new Error("削除に失敗しました。");
+      router.push('/');
 
-        notifications.show({
-          title: '成功',
-          message: '削除に成功しました。',
-          color: 'green',
-          position: 'top-center'
-        });
-      }
+      notifications.show({
+        title: '成功',
+        message: '削除に成功しました。',
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
       notifications.show({
@@ -123,19 +127,18 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
         }),
       });
 
-      if (res.ok) {
-        setStatus(prev => ({ ...prev, decided: !prev.decided }));
-        router.refresh();
-        setIsEditing(false);
+      if (!res.ok) throw new Error("更新に失敗しました。");
 
+      setStatus(prev => ({ ...prev, decided: !prev.decided }));
+      router.refresh();
+      setIsEditing(false);
 
-        notifications.show({
-          title: '成功',
-          message: `${status.decided ? '決定を取り消しました。' : '決定しました。'}`,
-          color: 'green',
-          position: 'top-center'
-        });
-      }
+      notifications.show({
+        title: '成功',
+        message: `${status.decided ? '決定を取り消しました。' : '決定しました。'}`,
+        color: 'green',
+        position: 'top-center'
+      });
     } catch (error) {
       console.log(error)
       notifications.show({
@@ -359,7 +362,7 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
           </Center>
         }
 
-        {role === Role.Staff && (
+        {isAnimalOwner && (
           <>
             <Center>
               <Text size="sm" c="dimmed" mt="xl">動物情報の編集や削除はこちら</Text>

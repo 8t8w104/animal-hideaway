@@ -34,6 +34,11 @@ export async function GET(req: NextRequest) {
             contentType: true,
             publicFlag: true,
           }
+        },
+        OrganizationAnimal: {
+          select: {
+            organizationId: true
+          }
         }
       },
       where: {
