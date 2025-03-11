@@ -9,7 +9,7 @@ export type UploadedFile = {
   url: string;
 };
 
-type DownloadFileProps = {
+export type DownloadFileProps = {
   filePath: string;
   downloadFileName?: string;
 }

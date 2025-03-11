@@ -1,4 +1,5 @@
 'use client'
+import { DownloadFileProps } from "@/types/FileProps";
 import { SignedUrlType } from "@/utils/constants";
 import { Button, Text, Box, Card } from "@mantine/core";
 import { useState } from "react";
