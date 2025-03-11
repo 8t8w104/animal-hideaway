@@ -20,12 +20,13 @@ import {
 } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { IconInfoCircle, IconStar, IconStarFilled } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from "@/store/useUserStore";
 import { Role } from '@/utils/constants';
 import { ApplicationStatus } from '@prisma/client';
 import { notifications } from '@mantine/notifications';
+import { FileViewer } from '@/app/components/FileViewer';
 
 export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
   const router = useRouter();
@@ -53,6 +54,15 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
     application: animal._count?.AdoptionApplication > 0,
     decided: animal.applicationStatus === ApplicationStatus.決定,
   });
+  const [uploadedFiles, setUploadedFiles] = useState<{ url: string }[]>([])
+
+  useEffect(() => {
+    const files: { url: string }[] = [];
+    animal.Image?.forEach((file) => {
+      files.push({ url: file.imageUrl ?? '/assets/noImage.jpg' });
+    });
+    setUploadedFiles(files);
+  }, [animal.Image]);
 
   // 各ステータスを更新する
   const handleChange = (key: string, value: string) => {
@@ -258,22 +268,28 @@ export const AnimalDetail = ({ animal }: { animal: AnimalWithRelations }) => {
       <Card shadow="sm" padding="lg" radius="md" withBorder bg="var(--bg-color)">
         <Grid>
           <Grid.Col span={12} bg="white" style={{ borderRadius: "12px" }}>
-            <Box
-              w={"100%"}
-              h={400}
-              bd="2px dashed #f8f9fa"
-              pos={"relative"}
-              style={{ borderRadius: "12px" }}
-            >
-              <Image
-                src={animal.Image[0]?.imageUrl || '/assets/noImage.jpg'}
-                alt={animal.name}
-                sizes="(max-width: 600px) 100vw, 500px"
-                fill
-                style={{ objectFit: 'contain' }}
-                priority
-              />
-            </Box>
+
+            {uploadedFiles.length > 0 ? (
+              <FileViewer savedFiles={uploadedFiles} />
+            ) : (
+              <Box
+                w={"100%"}
+                h={400}
+                bd="2px dashed #f8f9fa"
+                pos={"relative"}
+                style={{ borderRadius: "12px" }}
+              >
+                <Image
+                  src={'/assets/noImage.jpg'}
+                  alt={'noImage'}
+                  sizes="(max-width: 600px) 100vw, 500px"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  priority
+                />
+              </Box>
+            )}
+
           </Grid.Col>
           <Grid.Col span={12}>
             <Stack mt="md" gap="md">

@@ -5,6 +5,7 @@ import { Button, Card, Center, Text, Loader } from "@mantine/core";
 import { forwardRef, useState, useImperativeHandle } from "react";
 import imageCompression from 'browser-image-compression';
 import Image from 'next/image';
+import { UploadFileProps } from "@/types/FileProps";
 
 export const FileUploader = forwardRef<{
   handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }>,

@@ -19,6 +19,7 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
   });
   const [animals, setAnimals] = useState<AnimalWithRelations[]>(initAnimals);
   const { role } = useUserStore();
+  const [accordionValue, setAccordionValue] = useState<string | null>(null);
 
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -28,6 +29,7 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
       redirect(`/error?message=${response.status}:${response.statusText}`);
     }
     setAnimals(await response.json());
+    setAccordionValue(null);
   };
 
   const filterdPublicStatusOptions = useMemo(() => {
@@ -42,7 +44,13 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
 
   return (
     <Container py="xl">
-      <Accordion bg="var(--bg-color)" maw={500} mx="auto">
+      <Accordion
+        bg="var(--bg-color)"
+        maw={500}
+        mx="auto"
+        value={accordionValue}
+        onChange={setAccordionValue}
+      >
         <Accordion.Item value="search">
           <Accordion.Control>
             <Title order={5}>検索条件</Title>
