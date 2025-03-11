@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApplicationStatus, Gender, PrismaClient, PublicStatus } from "@prisma/client";
+import { ApplicationStatus, Gender, PrismaClient, PublicStatus, Image } from "@prisma/client";
 import { getSupabaseSignedUrl } from "@/utils/supabase";
 
 const prisma = new PrismaClient({
@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
           }
         },
         Image: {
+          take: 1, // 一覧画面では画像１枚のみ取得
           select: {
             parentId: true,
             imageUrl: true,

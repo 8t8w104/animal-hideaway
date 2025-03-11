@@ -1,12 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { ApplicationStatus, Gender, PrismaClient, PublicStatus } from "@prisma/client";
 
 const prisma = new PrismaClient({
   log: ['query', 'info', 'warn', 'error'],
 });
 
+
+type UploadFile = {
+  fileName: string,
+  generatedFilePath: string
+}
+
+type RequestBody = {
+  animalTypeId: string,
+  name: string,
+  gender: Gender,
+  applicationStatus: ApplicationStatus,
+  publicStatus: PublicStatus,
+  age: number,
+  description: string,
+  userId: string,
+  uploadedFiles?: UploadFile[]
+}
+
 export async function PUT(req: NextRequest) {
-  const body = await req.json();
+  const body: RequestBody = await req.json();
 
   try {
     // トランザクションを開始
@@ -37,21 +55,24 @@ export async function PUT(req: NextRequest) {
       console.log("inserted organizationAnimal")
 
       // 画像（image）
-      if (body.filePath) {
-        const image = await tx.image.create({
-          data: {
-            parentId: animal.id,
-            path: body.filePath || "",
-            fileName: body.fileName || "",
-          },
-        })
-        console.log(image)
-        console.log("inserted image")
+      let insertedImages
+      if (Array.isArray(body.uploadedFiles) && body.uploadedFiles.length > 0) {
+        // createMany で一括挿入
+        const imagesData = body.uploadedFiles.map((uploadedFile) => ({
+          parentId: animal.id,
+          path: uploadedFile.generatedFilePath || "",
+          fileName: uploadedFile.fileName || "",
+        }));
+
+        insertedImages = await tx.image.createMany({
+          data: imagesData,
+        });
       }
 
       return {
         animal,
-        organizationAnimal
+        organizationAnimal,
+        insertedImages
       };
     });
 

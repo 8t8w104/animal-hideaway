@@ -8,11 +8,12 @@ import { animalTypeOptions, applicationStatusOptions, genderOptions, publicStatu
 import { Animal, ApplicationStatus, Gender, PublicStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { notifications } from '@mantine/notifications';
+import { MultiFileUploader } from "@/app/components/MultiFileUploader";
 
 export const Regist = ({ userId }: { userId: string }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const fileUploadRef = useRef<{
-    handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }>
+    handleUpload: () => Promise<{ generatedFilePath: string, fileName: string }[]>
     clear: () => void
   }>(null);
   const router = useRouter();
@@ -42,9 +43,7 @@ export const Regist = ({ userId }: { userId: string }) => {
     setLoading(true);
     try {
 
-      const uploadResult = await fileUploadRef.current?.handleUpload();
-      if (!uploadResult) throw new Error("ファイルアップロードに失敗しました");
-
+      const uploadedFiles = await fileUploadRef.current?.handleUpload();
       const res = await fetch("/api/regist", {
         method: "PUT",
         headers: {
@@ -54,8 +53,7 @@ export const Regist = ({ userId }: { userId: string }) => {
           {
             ...form.values,
             userId,
-            filePath: uploadResult?.generatedFilePath || "",
-            fileName: uploadResult?.fileName || "",
+            uploadedFiles
           }
         ),
       });
@@ -84,7 +82,7 @@ export const Regist = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <Container size={600} my="xl">
+    <Container size="sm" my="xl">
       <Card shadow="sm" padding="lg" radius="md" withBorder>
         <Title order={2} mb="md" c="blue">動物登録</Title>
         <form onSubmit={form.onSubmit(handleCreate)}>
@@ -105,10 +103,12 @@ export const Regist = ({ userId }: { userId: string }) => {
             <Textarea label="説明" {...form.getInputProps("description")} />
             <Select label="応募状況" data={applicationStatusOptions} {...form.getInputProps("applicationStatus")} />
             <Select label="公開状況" data={publicStatusOptions} {...form.getInputProps("publicStatus")} />
-            <FileUploader
-              userId={userId}
-              ref={fileUploadRef} />
-            {/* <FileDownloader filePath={filePath} downloadFileName={fileName} /> */}
+            {userId &&
+              <MultiFileUploader
+                userId={userId}
+                ref={fileUploadRef} />
+            }
+
             <Group mt="md">
               <Button type="submit" loading={loading} size="lg" color="blue">
                 登録
