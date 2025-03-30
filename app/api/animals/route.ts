@@ -38,16 +38,21 @@ export async function GET(req: NextRequest) {
         },
         OrganizationAnimal: {
           select: {
-            organizationId: true
+            organizationId: true,
+            organization: {
+              select: {
+                name: true
+              }
+            }
           }
         }
       },
       where: {
         name: name ? { contains: name.toString() } : undefined,
-        gender: gender as Gender,
-        applicationStatus: applicationStatus as ApplicationStatus,
-        publicStatus: publicStatus as PublicStatus,
-        animalTypeId: animalType ? Number(animalType) : undefined
+        gender: gender ? { in: Array.isArray(gender) ? gender.map(g => g as Gender) : [gender as Gender] } : undefined,
+        applicationStatus: applicationStatus ? { in: Array.isArray(applicationStatus) ? applicationStatus.map(s => s as ApplicationStatus) : [applicationStatus as ApplicationStatus] } : undefined,
+        publicStatus: publicStatus ? { in: Array.isArray(publicStatus) ? publicStatus.map(s => s as PublicStatus) : [publicStatus as PublicStatus] } : undefined,
+        animalTypeId: animalType ? { in: Array.isArray(animalType) ? animalType.map(Number) : [Number(animalType)] } : undefined
       }
     });
 

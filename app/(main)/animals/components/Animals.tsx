@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useState } from 'react';
-import { Accordion, Box, Button, Card, Container, Grid, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Accordion, Box, Button, Card, Container, Grid, MultiSelect, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { AnimalWithRelations } from '@/types/Animal';
 import { PublicStatus } from '@prisma/client';
 import { redirect, useRouter } from 'next/navigation';
@@ -10,12 +10,18 @@ import Image from 'next/image';
 
 export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] }) => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    animalType: string[];
+    gender: string[];
+    applicationStatus: string[];
+    publicStatus: string[];
+  }>({
     name: '',
-    animalType: '',
-    gender: '',
-    applicationStatus: '',
-    publicStatus: '',
+    animalType: [],
+    gender: [],
+    applicationStatus: [],
+    publicStatus: [],
   });
   const [animals, setAnimals] = useState<AnimalWithRelations[]>(initAnimals);
   const { role } = useUserStore();
@@ -23,8 +29,17 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
 
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
-    const queryParams = new URLSearchParams(Object.entries(formData).filter(([_, v]) => v));
-    const response = await fetch(`/api/animals?${queryParams}`);
+    // const queryParams = new URLSearchParams(Object.entries(formData).filter(([_, v]) => v));
+    // const response = await fetch(`/api/animals?${queryParams}`);
+    const params = new URLSearchParams();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length > 0) {
+        value.forEach(v => params.append(key, v));
+      } else if (typeof value === 'string' && value) {
+        params.append(key, value);
+      }
+    });
+    const response = await fetch(`/api/animals?${params}`);
     if (!response.ok) {
       redirect(`/error?message=${response.status}:${response.statusText}`);
     }
@@ -64,33 +79,33 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
-                <Select
+                <MultiSelect
                   label="種類"
                   value={formData.animalType}
-                  onChange={value => setFormData({ ...formData, animalType: value || '' })}
+                  onChange={value => setFormData({ ...formData, animalType: value })}
                   data={animalTypeOptions.map((opt) => ({
                     value: String(opt.value), label: opt.label,
                   }))}
                 />
-                <Select
+                <MultiSelect
                   label="性別"
                   value={formData.gender}
-                  onChange={(value) => setFormData({ ...formData, gender: value || '' })}
+                  onChange={(value) => setFormData({ ...formData, gender: value })}
                   data={genderOptions}
                 />
-                <Select
+                <MultiSelect
                   label="申請状況"
                   value={formData.applicationStatus}
-                  onChange={value => setFormData({ ...formData, applicationStatus: value || '' })}
+                  onChange={value => setFormData({ ...formData, applicationStatus: value })}
                   data={applicationStatusOptions.map((opt) => ({
                     value: String(opt.value),
                     label: opt.label,
                   }))}
                 />
-                <Select
+                <MultiSelect
                   label="公開状況"
                   value={formData.publicStatus}
-                  onChange={(value) => setFormData({ ...formData, publicStatus: value || '' })}
+                  onChange={(value) => setFormData({ ...formData, publicStatus: value })}
                   data={filterdPublicStatusOptions}
                 />
                 <Button type="submit">検索</Button>
@@ -137,7 +152,13 @@ export const Animals = ({ initAnimals }: { initAnimals: AnimalWithRelations[] })
                 {animal.name}
               </Text>
               <Text size="xs" c="dimmed">
-                {animal.gender} | {animal.applicationStatus} | {animal.publicStatus}
+                性別：{animal.gender} | 状況：{animal.applicationStatus}
+                {/* {animal.publicStatus} */}
+              </Text>
+
+
+              <Text size="xs" c="dimmed">
+                保護職員：{animal.OrganizationAnimal?.[0]?.organization?.name}
               </Text>
             </Card>
           </Grid.Col>
