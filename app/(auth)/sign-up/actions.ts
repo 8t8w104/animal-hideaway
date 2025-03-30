@@ -22,7 +22,9 @@ export async function signup(formData: ExtendedFormData) {
     password,
     options: {
       data: {
-        name,
+        // full_name: 'full_name',
+        // avatar_url: 'avatar_url',
+        username: name,
         role: userType
       },
     },

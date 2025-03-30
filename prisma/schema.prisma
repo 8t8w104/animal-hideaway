@@ -93,6 +93,7 @@ model Individual {
 model Organization {
   id  Int @id @default(autoincrement()) 
   organizationId String @unique @db.Uuid
+  name String 
 
   InquiryMeta InquiryMeta[]
   OrganizationAnimal OrganizationAnimal[]
